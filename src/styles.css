@@ -589,7 +589,46 @@ button.ghost.ink {
 .event-body .vn-hint {
   margin-top: 10px;
   font-size: 12px;
-  color: var(--green);
+  color: var(--ok);
+}
+
+.narration {
+  margin: 0 0 10px;
+  line-height: 1.65;
+  font-size: 13px;
+}
+
+.say {
+  display: flex;
+  margin: 0 0 10px;
+}
+
+.say.npc {
+  justify-content: flex-start;
+}
+
+.say.you {
+  justify-content: flex-end;
+}
+
+.say .bubble {
+  max-width: 86%;
+  margin: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 12px;
+  line-height: 1.65;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.say.you .bubble {
+  background: var(--chip);
+}
+
+.say.vn-past .bubble {
+  color: #6a7a72;
 }
 
 .npc-card {
@@ -698,11 +737,35 @@ button.tiny:disabled {
   padding-bottom: 4px;
 }
 
+.event-sheet h4 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.event-sheet .sheet-row {
+  display: grid;
+  grid-template-columns: 4.5em 1fr;
+  gap: 6px 12px;
+  align-items: start;
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.event-sheet .sheet-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.event-sheet .sheet-row span:last-child {
+  white-space: pre-wrap;
+}
+
 .sign-card {
-  text-align: center;
+  text-align: left;
 }
 
 .sign-card h2 {
+  text-align: center;
   font-size: 20px;
   letter-spacing: 0.12em;
 }

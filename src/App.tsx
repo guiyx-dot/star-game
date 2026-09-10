@@ -4,13 +4,14 @@ import { Planner } from './Planner'
 import { ScriptNeed, ScriptSheet } from './ScriptSheet'
 import { fanText, phoneComments } from './engine/phone'
 import { afterRecap, seasonById } from './engine/calendar'
-import { eventBeats } from './engine/story'
+import { eventUnits, type StoryBeat } from './engine/story'
 import {
   ATTR_LABEL,
   NPC_NAME,
   WEEKDAYS,
   playYear,
   weekInYear,
+  type EventSheet,
   type GameEvent,
   type GameState,
   type IdentityId,
@@ -40,6 +41,8 @@ import {
   wearItem,
   splitLogLine,
   weekLines,
+  contractSheet,
+  SIGN_TALK,
 } from './engine/game'
 import {
   GRADE_LABEL,
@@ -54,15 +57,60 @@ function yuan(n: number): string {
   return `${n}元`
 }
 
-function EventText({ text }: { text: string }) {
-  if (!text.trim()) return null
+function signEventView(event: GameEvent): GameEvent {
+  const script = event.scriptId ? scriptById(event.scriptId) : undefined
+  return {
+    ...event,
+    sheet: event.sheet ?? (script ? contractSheet(script) : undefined),
+    talk: event.talk ?? SIGN_TALK,
+    body: '',
+  }
+}
+
+function EventSheetBox({ sheet }: { sheet: EventSheet }) {
   return (
-    <div className="event-body">
-      {text.split(/\n\n+/).map((para, i) => (
-        <p key={i}>{para}</p>
+    <section className="invite-box event-sheet">
+      {sheet.heading ? <h4 className="serif">{sheet.heading}</h4> : null}
+      {sheet.rows.map((row) => (
+        <p key={row.label} className="sheet-row">
+          <span className="muted">{row.label}</span>
+          <span>{row.value}</span>
+        </p>
       ))}
+    </section>
+  )
+}
+
+function StoryLine({ beat, past }: { beat: StoryBeat; past?: boolean }) {
+  if (beat.kind === 'talk') {
+    return (
+      <div className={`say ${beat.from === 'you' ? 'you' : 'npc'}${past ? ' vn-past' : ' vn-now'}`}>
+        <p className="bubble">{beat.text}</p>
+      </div>
+    )
+  }
+  return <p className={`narration ${past ? 'vn-past' : 'vn-now'}`}>{beat.text}</p>
+}
+
+function EventText({ event, text }: { event?: GameEvent; text?: string }) {
+  const beats = text != null ? unitsFromText(text) : event ? eventUnits(event) : []
+  if (!event?.sheet && !beats.length) return null
+  return (
+    <div className="event-copy">
+      {event?.sheet ? <EventSheetBox sheet={event.sheet} /> : null}
+      {beats.length ? (
+        <div className="event-body">
+          {beats.map((beat, i) => (
+            <StoryLine key={i} beat={beat} />
+          ))}
+        </div>
+      ) : null}
     </div>
   )
+}
+
+function unitsFromText(text: string): StoryBeat[] {
+  return eventUnits({ id: '', title: '', body: text, options: [] })
 }
 
 function EventStory({
@@ -74,24 +122,23 @@ function EventStory({
   onChoose: (id: string) => void
   extra?: ReactNode
 }) {
-  const beats = eventBeats(event)
+  const beats = eventUnits(event)
   const [shown, setShown] = useState(beats.length ? 1 : 0)
   useEffect(() => {
     setShown(beats.length ? 1 : 0)
-  }, [event.id, event.body])
+  }, [event.id, event.body, event.talk])
   const done = !beats.length || shown >= beats.length
   return (
     <>
+      {event.sheet ? <EventSheetBox sheet={event.sheet} /> : null}
       <div
         className="event-body vn"
         onClick={() => {
           if (!done) setShown((n) => Math.min(beats.length, n + 1))
         }}
       >
-        {beats.slice(0, shown).map((line, i) => (
-          <p key={i} className={i === shown - 1 ? 'vn-now' : 'vn-past'}>
-            {line}
-          </p>
+        {beats.slice(0, shown).map((beat, i) => (
+          <StoryLine key={i} beat={beat} past={i !== shown - 1} />
         ))}
         {!done ? <p className="vn-hint">点击继续</p> : extra}
       </div>
@@ -498,7 +545,7 @@ export function App() {
         <div className="modal-back">
           <div className="modal wide">
             <h2>{state.event.title}</h2>
-            <EventText text={state.event.body} />
+            <EventText event={state.event} />
             {tableOffers.map((s) => (
               <div key={s.id} className={`script-card g-${s.grade}`}>
                 <h3 className="serif">《{s.title}》</h3>
@@ -510,7 +557,7 @@ export function App() {
                 </div>
                 {s.awardTrack ? <p className="award-hint">颁奖季会盯这部。</p> : null}
                 {s.press[0] ? <p className="award-hint">{s.press[0]}</p> : null}
-                {s.hype === 'ip' && !s.press[0] ? <p className="award-hint">大 IP。选角已经传开了。</p> : null}
+                {s.hype === 'ip' && !s.press[0] ? <p className="award-hint">原著读者很多，选角已经传开了。</p> : null}
                 {s.unlock && highlightLine(s) ? <p className="award-hint">{highlightLine(s)}</p> : null}
                 {s.hype !== 'ip' && !s.awardTrack && !s.unlock && !s.press[0] && hypeLine(s) ? (
                   <p className="award-hint">{hypeLine(s)}</p>
@@ -577,7 +624,7 @@ export function App() {
         <div className="modal-back">
           <div className="modal sign-card">
             <h2>通告签约</h2>
-            <EventText text={state.event.body} />
+            <EventText event={signEventView(state.event)} />
             <div className="row invite-actions">
               <button className="ghost" onClick={() => patch(choose(state, 'abort'))}>
                 把笔放下
@@ -592,7 +639,7 @@ export function App() {
         <div className="modal-back">
           <div className="modal wide">
             <h2>{state.event.title}</h2>
-            <EventText text={state.event.body} />
+            <EventText event={state.event} />
             {state.lastNote === '卡里不够' || state.lastNote === '衣橱里已经有一件了' ? <p className="note">{state.lastNote}</p> : null}
             {(
               [
@@ -636,7 +683,7 @@ export function App() {
         <div className="modal-back">
           <div className="modal wide">
             <h2>{state.event.title}</h2>
-            <EventText text={state.event.body} />
+            <EventText event={state.event} />
             <p>现在住{house.name}。</p>
             {state.lastNote && !state.lastNote.startsWith('你进了中介') ? <p className="note">{state.lastNote}</p> : null}
             {HOUSES.filter((h) => h.price > 0).map((house) => (

@@ -44,12 +44,21 @@ export type GameEventOption = {
 
 export type Track = 'film' | 'music' | 'variety'
 
+export type EventSheet = {
+  heading?: string
+  rows: { label: string; value: string }[]
+}
+
 export type GameEvent = {
   id: string
   title: string
   body: string
   /** 点一下出一句。没有时按正文拆开。 */
   lines?: string[]
+  /** 合同、通告一类的条款，和对话分开排。 */
+  sheet?: EventSheet
+  /** 条款下面的一句对话。 */
+  talk?: string
   options: GameEventOption[]
   scriptId?: string
   track?: Track

@@ -119,7 +119,7 @@ export function phoneComments(state: GameState): PhoneComment[] {
   if (state.fans >= 20000) {
     pool.push(
       { user: '粉', text: '今天也在。你有空回一条吗。' },
-      { user: '黑', text: '红了就开始摆。' },
+      { user: '骂的人', text: '红了就开始摆。' },
     )
   }
 

@@ -517,13 +517,7 @@ export function auditionOkEvent(script: ScriptDef): GameEvent {
     title: '试完',
     body: `试完以后，选角导演让你在外面等。
 
-过了十几分钟，周衡从办公室出来，手里多了一份合同。
-
-你刚站起来，她就把合同挡在你面前：「先别笑。人家只是愿意用你，还没签。」
-
-「那现在看吗？」
-
-「不然我拿出来干什么？」她翻到工期那一页，「先看时间，再看钱。确认都能做到，最后才签名字。」`,
+过了十几分钟，周衡从办公室出来，手里多了一份合同。`,
     scriptId: script.id,
     options: [
       { id: 'sign', label: '去看合同' },

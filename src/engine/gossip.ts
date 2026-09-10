@@ -56,6 +56,16 @@ const WORLD_FROM: Record<string, number> = {
   'w-painted': 3,
   'w-cipher': 3,
   'w-citylamp': 3,
+  'w-teahouse': 2,
+  'w-sideline': 2,
+  'w-loopbus': 2,
+  'w-supper': 2,
+  'w-phototime': 2,
+  'w-bund': 3,
+  'w-rivermouth': 3,
+  'w-exitvisa': 3,
+  'w-mythcamp': 3,
+  'w-signedname': 3,
 }
 
 function worldOpen(week: number, w: WorldLine) {
@@ -63,93 +73,103 @@ function worldOpen(week: number, w: WorldLine) {
 }
 
 const WORLD: WorldLine[] = [
-  { id: 'w-rank', text: '江晚宁《庭前雪》海报顺序又改了一版。片方说「按合同」，原著粉说按人气。小郡主那栏还空着。', tone: 'mixed' },
-  { id: 'w-late', text: '陆承宴片场迟到三小时。何朗把盒饭盖上，没说话。', tone: 'bad' },
-  { id: 'w-double', text: '韩迟、江晚宁机场同框。工作室说「纯路透」，粉丝已经写成官宣。', tone: 'mixed' },
-  { id: 'w-dress', text: '红毯上顾辞晚和白疏影撞衫。站姐先吵，品牌后发声明。', tone: 'mixed' },
-  { id: 'w-ad', text: '江晚宁代言被曝夸大宣传。评论区在问她自己用不用。', tone: 'bad' },
-  { id: 'w-cut', text: '宋知夏《人间长夏》吻戏被剪。原著粉骂片方，路人说早该剪。', tone: 'mixed' },
-  { id: 'w-double-body', text: '裴渡动作戏替身路透流出。粉丝说「那是角度」，黑说「那是整个人」。', tone: 'bad' },
-  { id: 'w-director', text: '齐衡组拍摄过半换执行导演。盛宴到场那天，监视器后面多了一排人。', tone: 'mixed' },
-  { id: 'w-money', text: '传陆承宴那部撤资。杀青宴取消，群里只剩「等通知」。', tone: 'bad' },
-  { id: 'w-water', text: '宋知夏上星剧注水到八十集。编剧把「吃饭」写成三集。', tone: 'bad' },
-  { id: 'w-pay', text: '白疏影片酬倒挂传闻。她比江晚宁高，片方说「没有这回事」。', tone: 'mixed' },
-  { id: 'w-seat', text: '韩迟杀青照少了半边人。有人说档期，有人说不欢而散。', tone: 'mixed' },
-  { id: 'w-promo', text: '陆承宴不宣传。物料只发他，江晚宁那边已经在问是不是被冷处理。', tone: 'mixed' },
-  { id: 'w-leak', text: '假路透把陈晚秋旧剧妆造P进新组，营销号照转。', tone: 'mixed' },
-  { id: 'w-buy', text: '有人爆料韩迟，帖子又立刻没了。有人说花钱撤的，有人说被压的。', tone: 'mixed' },
-  { id: 'w-hug', text: '机场拥抱被拍。陆承宴说同事，顾辞晚说风大。', tone: 'mixed' },
-  { id: 'w-ignore', text: '韩迟、江晚宁同框不互动。粉丝剪了「眼神」十六秒，路人说那叫看提词器。', tone: 'mixed' },
-  { id: 'w-work', text: '顾辞晚同一天三场直播。评论区问她还睡不睡觉。', tone: 'mixed' },
-  { id: 'w-hate', text: '江晚宁新剧未播先骂。选角刚出，原著粉已经准备退款。', tone: 'bad' },
-  { id: 'w-audit', text: '白疏影被写「没试镜」。经纪公司发了候场照，没人信。', tone: 'mixed' },
-  { id: 'w-school', text: '学院派出来说陆承宴不会演戏。陆承宴回：票房不会说谎。', tone: 'mixed' },
-  { id: 'w-award', text: '金桂奖内定传闻又起。组委会点名陈晚秋：「请以公布为准」。', tone: 'mixed' },
-  { id: 'w-close', text: '沈照组又在传关门拍。探班的站姐在酒店走廊等到天亮。', tone: 'mixed' },
-  { id: 'w-end', text: '宋知夏大结局角色死了。粉籍连夜脱粉，骂得比正片还响。', tone: 'bad' },
-  { id: 'w-contract', text: '韩迟解约。前经纪公司凌晨声明，新工作室下午挂牌。', tone: 'mixed' },
-  { id: 'w-assist', text: '陆承宴前助理实名爆料。录音真假还没鉴定，律师函已经到了。', tone: 'bad' },
-  { id: 'w-age', text: '顾辞晚年龄被扒。户口本和简历差四岁，她说「演的是心态」。', tone: 'bad' },
-  { id: 'w-filter', text: '白疏影生图和精修差出一张脸。品牌方还在用精修，广场已经在叠生图。', tone: 'mixed' },
-  { id: 'w-lip', text: '韩迟演唱会假唱锤。耳返漏音那一下，粉丝从维护变成对线。', tone: 'bad' },
-  { id: 'w-talk', text: '江晚宁采访口误。她把何朗的名字叫错，第二天还在被人剪。', tone: 'bad' },
-  { id: 'w-carpet', text: '红毯上顾辞晚踩裙。她笑着捡起来，剪辑只留那一下踉跄。', tone: 'mixed' },
-  { id: 'w-surgery', text: '白疏影整容传闻配对比图。她发了旧照，评论说「角度」。', tone: 'mixed' },
-  { id: 'w-chart', text: '陆承宴打榜后台被晒。粉丝说「爱豆不容易」，路人说「那是数据」。', tone: 'bad' },
-  { id: 'w-unfan', text: '江晚宁脱粉回踩长文。前粉把旧物料一张张翻出来，比黑还细。', tone: 'bad' },
-  { id: 'w-hanchi', text: '韩迟新恋情疑云。女方侧脸只有半张，已经有人P成官宣海报。', tone: 'mixed' },
-  { id: 'w-wine', text: '饭局照片流出。有人指认盛宴，有人说那是杀青宴。', tone: 'mixed' },
-  { id: 'w-stream', text: '宋知夏剧超前点播被骂割。弹幕比正片快两集，剧透组已经开张。', tone: 'mixed' },
-  { id: 'w-extra', text: '群演实名说被裴渡组骂。片方回「沟通问题」，视频还在转。', tone: 'bad' },
-  { id: 'w-wig', text: '江晚宁古装假发路透。头套边缘比戏还出戏，妆造连夜发长文。', tone: 'mixed' },
-  { id: 'w-seat2', text: '颁奖季座位表流出。陈晚秋在第一排，白疏影在侧边。站姐比名单先吵。', tone: 'mixed' },
-  { id: 'w-collapse', text: '陆承宴录音还没鉴定完，代言已经撤了三支。', tone: 'bad' },
-  { id: 'w-oldlove', text: '韩迟旧恋情录音流出。他这边说酒桌玩笑，女方工作室连夜切割。', tone: 'bad' },
-  { id: 'w-cutstudio', text: '陆承宴工作室发声明割席。本人三条之后才转发，粉已经撕开了。', tone: 'bad' },
-  { id: 'w-livefail', text: '顾辞晚直播连麦翻车。她把提词器念出声，对面没关麦。', tone: 'mixed' },
-  { id: 'w-showfail', text: '顾辞晚走秀踩空。品牌先删视频，路人先截原片。', tone: 'mixed' },
-  { id: 'w-nbrush', text: '陈晚秋旧剧被翻出来连刷。弹幕全是现任，原班人马在骂「滚去播新的」。', tone: 'mixed' },
-  { id: 'w-biao', text: '江晚宁新剧海报一出，评论只记得陈晚秋那部十年前的。片方说这次不靠旧的活。', tone: 'mixed' },
-  { id: 'w-runner', text: '白疏影陪跑第五次。她笑着说「提名就是认可」，镜头切到空座位。', tone: 'mixed' },
-  { id: 'w-vote', text: '陆承宴投票倒计时被晒刷票后台。主办方说「系统波动」，榜单已经写死。', tone: 'bad' },
-  { id: 'w-sub', text: '字幕组把宋知夏的情话译成口号。原著粉连夜出对照，官方还在用错的。', tone: 'mixed' },
-  { id: 'w-cam', text: '路透机位被抓。沈照组清场，站姐在停车场对骂谁泄的地址。', tone: 'mixed' },
-  { id: 'w-split', text: '剧宣物料陆承宴、江晚宁分开发。官博隔了十一分钟，两边都说被冷。', tone: 'mixed' },
-  { id: 'w-namejoke', text: '江晚宁角色名被谐音梗玩疯。她发了澄清，梗比澄清跑得快。', tone: 'mixed' },
-  { id: 'w-table', text: '酒桌座位流出。盛宴坐主位、陆承宴倒酒，比剧情还细。', tone: 'mixed' },
-  { id: 'w-copy', text: '版权方换人。江晚宁原班二创全下架，粉丝连夜存图。', tone: 'mixed' },
-  { id: 'w-throw', text: '韩迟应援物被扔出场。安保说「按规定」，粉籍连夜脱。', tone: 'bad' },
-  { id: 'w-behind', text: '陈晚秋花絮比正片好看。正片评论区在求导演去看花絮组。', tone: 'good' },
-  { id: 'w-revive', text: '选秀复活位票数一夜翻倍。节目组说「海外票」，黑说「那是房间」。', tone: 'bad' },
-  { id: 'w-ghost', text: '代拍号被锤。同一张「偶遇韩迟」出现在三个城市，定位还开着。', tone: 'mixed' },
-  { id: 'w-pr', text: '公关稿把江晚宁写成白疏影。十分钟删帖，截图已经进了广场。', tone: 'mixed' },
-  { id: 'w-starferry', text: '《星河渡》超前点播预告先出女二。一半说原著就是这样，一半说又改成恶毒女二。', tone: 'mixed' },
-  { id: 'w-starcast', text: '《星河渡》选角名单泄漏。江晚宁女主、陆承宴上神，女二那栏空着。原著粉连夜列不能碰的人设。', tone: 'mixed' },
-  { id: 'w-starwig', text: '《星河渡》服化道路透。头套边缘出戏，妆造连夜发长文，说成片为准。', tone: 'mixed' },
-  { id: 'w-snowbanquet', text: '《庭前雪》围读传出联姻宴席。女三没有拔剑，只有敬酒和落座。有人说难演。', tone: 'mixed' },
-  { id: 'w-sweetclip', text: '《请你偏爱》超前点播只剪退婚。切片号在等摘戒指那一下，女三换了几轮。', tone: 'mixed' },
-  { id: 'w-goldtable', text: '《金座》酒桌戏先传。滨江夜宴，投资人把项目按在转盘边上谈。女三那席还没定。', tone: 'mixed' },
-  { id: 'w-coat', text: '《白大褂》医顾问组进组。口型、病历、推床路线都要过。齐衡不爱重来。', tone: 'mixed' },
-  { id: 'w-noise', text: '《白噪音》剧本围读流出几页。写字楼心理门诊，没有血腥，全是谈话。', tone: 'mixed' },
-  { id: 'w-north', text: '《北站》在车站实拍。春运是真的，广播词改了十一稿。有人说能进预告。', tone: 'mixed' },
-  { id: 'w-summerip', text: '《盛夏未完》琴房加练路透。原声还是后期，评论已经吵开了。', tone: 'mixed' },
-  { id: 'w-unclewater', text: '《我的二舅爷》预告出了通水那天。弹幕在刷我们县也是这样过来的。', tone: 'good' },
-  { id: 'w-unnameddoor', text: '沈照《未命名》关门拍。探班只拍到一箱退货的书。圈里当冲奖看。', tone: 'mixed' },
-  { id: 'w-cpmeet', text: '《对手戏》路透出了会议室对吵。弹幕已经在嗑，官配粉已经在骂又发糖。', tone: 'mixed' },
-  { id: 'w-pepper', text: '《椒房春》女二蕙嫔还没定。后宫、年家、更衣。圈里拿它跟一宫里活十年的戏比。', tone: 'mixed' },
-  { id: 'w-redcase', text: '《赤焰案》围读流出拒婚词。梁郡主挂帅，不是来联姻的。', tone: 'mixed' },
-  { id: 'w-dust', text: '沈照《隐尘》找女主。西北、土地、病。片酬低，冲奖向。', tone: 'mixed' },
-  { id: 'w-youngbook', text: '《少年书》尺度会审。校园、录像、保护。片方要不像说教。', tone: 'mixed' },
-  { id: 'w-northwind', text: '《风过北河》注水传闻已经出来。律师那场，顾问组盯口型。', tone: 'mixed' },
-  { id: 'w-returner', text: '《故人归》女主三轮试镜。原著粉准备退款。有人和《星河渡》对打热度。', tone: 'mixed' },
-  { id: 'w-shore', text: '沈照《岸边》找女主。海边、返乡。圈里当冲影后看。', tone: 'mixed' },
-  { id: 'w-weiyang', text: '《未央辞》女主还在选。从更衣到掌事。海报一出，评论只记得旧的那部。', tone: 'mixed' },
+  { id: 'w-rank', text: '当红女星江晚宁在拍古装权谋《庭前雪》。浪潮时代的A级网剧。海报上谁的名字排前面，又改了一版：片方说按合同，原著粉说按人气。女三小郡主那栏还空着。', tone: 'mixed' },
+  { id: 'w-late', text: '流量小生陆承宴片场迟到三个小时。同组的老戏骨何朗把盒饭盖上，没说话。通告没法按点拍，组里已经有人在问今晚还改不改。', tone: 'bad' },
+  { id: 'w-double', text: '一线男星韩迟和当红女星江晚宁前后脚出机场，被拍到一起过安检。工作室说只是偶遇，粉丝已经写成官宣。', tone: 'mixed' },
+  { id: 'w-dress', text: '颁奖红毯上，顾辞晚和新锐女演员白疏影穿了同一套。跟拍的人先吵是谁先订的，品牌后发声明，说两套本来就不是同一场。', tone: 'mixed' },
+  { id: 'w-ad', text: '当红女星江晚宁的护肤品代言被曝夸大宣传。评论区在问她自己用不用，品牌先删评，她这边还没出声。', tone: 'bad' },
+  { id: 'w-cut', text: '长剧女主宋知夏的《人间长夏》有一场吻戏被剪掉。原著粉骂片方毁原著，路人说早该剪。她工作室只回了一句：以播出为准。', tone: 'mixed' },
+  { id: 'w-double-body', text: '动作男星裴渡有一场动作戏，替身的现场照片先传出去了。粉丝说那是角度，骂的人说那是整个人。片方还没认，视频还在转。', tone: 'bad' },
+  { id: 'w-director', text: '导演齐衡的组拍过一半，换了执行导演。盛宴到场那天，监视器后面多了一排人。组里说是进度，也有人说是投资方不放心。', tone: 'mixed' },
+  { id: 'w-money', text: '流量小生陆承宴那部戏传要撤资。杀青宴取消，工作群里只剩等通知。演员还在酒店，没人敢自己发。', tone: 'bad' },
+  { id: 'w-water', text: '长剧女主宋知夏那部上星剧，集数被拉到八十集。编剧把一顿饭写成三集。有人说好歹有她撑着，有人说看到第三十集已经不想追了。', tone: 'bad' },
+  { id: 'w-pay', text: '新锐女演员白疏影的片酬被写成比当红女星江晚宁还高。片方说没有这回事，两边粉丝已经开始对名单。', tone: 'mixed' },
+  { id: 'w-seat', text: '一线男星韩迟的杀青照少了半边人。有人说是档期撞了，有人说不欢而散。他工作室发了全员合影，缺的那个人还是不在。', tone: 'mixed' },
+  { id: 'w-promo', text: '流量小生陆承宴不出来宣传。宣传片子只发他，当红女星江晚宁那边已经在问是不是被冷处理。官方账号隔了很久才补她一张。', tone: 'mixed' },
+  { id: 'w-leak', text: '有人把影后陈晚秋旧剧的妆造P进新组，当成现场照片发出去。营销号照转，妆造连夜发长文辟谣，说等正片。', tone: 'mixed' },
+  { id: 'w-buy', text: '有人发帖爆料一线男星韩迟，帖子发出去不到一小时又没了。有人说花钱撤的，有人说被压的。他本人还没出声。', tone: 'mixed' },
+  { id: 'w-hug', text: '流量小生陆承宴和红毯女星顾辞晚在机场拥抱，被拍了。他说同事，她说风大。两边评论已经写成一出戏。', tone: 'mixed' },
+  { id: 'w-ignore', text: '一线男星韩迟和当红女星江晚宁同框，两个人几乎没说话。粉丝剪了「眼神」十六秒，路人说那叫看提词器。', tone: 'mixed' },
+  { id: 'w-work', text: '红毯女星顾辞晚同一天连着三场直播。评论区问她还睡不睡觉，她回了一句合同写的，又被截去骂。', tone: 'mixed' },
+  { id: 'w-hate', text: '当红女星江晚宁新剧选角刚出，原著粉已经准备退款。戏还没拍，评论区已经在骂脸、骂人设、骂又是她。', tone: 'bad' },
+  { id: 'w-audit', text: '新锐女演员白疏影被写成没试镜就进组。经纪公司发了候场照，时间对得上，还是没人信。', tone: 'mixed' },
+  { id: 'w-school', text: '电影学院有老师出来说流量小生陆承宴不会演戏。陆承宴回：票房不会说谎。学院帖子还在，他那条已经上了热搜。', tone: 'mixed' },
+  { id: 'w-award', text: '金桂奖又有人说名次内定。组委会点名影后陈晚秋，让大家等公布。她这边没回应，陪跑名单已经先传了一圈。', tone: 'mixed' },
+  { id: 'w-close', text: '沈照组又不让探班。跟拍的人在酒店走廊等到天亮，只拍到一箱道具。地址谁泄的还没查清，组里先清场。', tone: 'mixed' },
+  { id: 'w-end', text: '长剧女主宋知夏的大结局，角色死了。粉丝连夜说不粉了，骂得比正片还响。片方说早有伏笔，没人听。', tone: 'bad' },
+  { id: 'w-contract', text: '一线男星韩迟解约。前经纪公司凌晨发声明，新工作室下午挂牌。两边都说和平分开，评论在问谁先不要谁。', tone: 'mixed' },
+  { id: 'w-assist', text: '流量小生陆承宴前助理实名发帖。录音真假还没人鉴定，律师函已经到了。代言那边开始问今晚还撤不撤。', tone: 'bad' },
+  { id: 'w-age', text: '红毯女星顾辞晚的年龄被扒。户口本和简历差四岁，她说演的是心态。旧采访被翻出来，数字对不上。', tone: 'bad' },
+  { id: 'w-filter', text: '新锐女演员白疏影的生图和精修差出一张脸。品牌方还在用精修，广场已经在叠没修过的那张。', tone: 'mixed' },
+  { id: 'w-lip', text: '一线男星韩迟演唱会被指假唱。耳返漏音那一下，粉丝从维护变成对骂。节目组说设备问题，原片还在。', tone: 'bad' },
+  { id: 'w-talk', text: '当红女星江晚宁采访口误，把老戏骨何朗的名字叫错。她后来补了一句抱歉，被剪出来的还是那一下。', tone: 'bad' },
+  { id: 'w-carpet', text: '颁奖红毯上，顾辞晚踩到裙摆。她笑着捡起来继续走，剪辑只留那一下踉跄，评论已经写成翻车。', tone: 'mixed' },
+  { id: 'w-surgery', text: '新锐女演员白疏影被配了整容对比图。她发了旧照，评论说角度。品牌活动照还在用精修。', tone: 'mixed' },
+  { id: 'w-chart', text: '流量小生陆承宴打榜的后台被晒出来。粉丝说爱豆不容易，路人说那是数据。平台先把页面藏了，截图已经出去了。', tone: 'bad' },
+  { id: 'w-unfan', text: '当红女星江晚宁被前粉写了长文，一张张翻旧宣传片子，比骂她的人还细。她工作室回祝好，评论区没停。', tone: 'bad' },
+  { id: 'w-hanchi', text: '一线男星韩迟被写成新恋情。女方侧脸只有半张，已经有人P成官宣海报。两边工作室都说不认识。', tone: 'mixed' },
+  { id: 'w-wine', text: '一桌饭局照片流出来。有人指认导演盛宴坐主位，有人说那是杀青宴。座位比剧情传得还细。', tone: 'mixed' },
+  { id: 'w-stream', text: '长剧女主宋知夏的剧被提前点播，弹幕比正片快两集。有人骂割韭菜，剧透组已经开张，官方还在用敬请期待。', tone: 'mixed' },
+  { id: 'w-extra', text: '群演实名说在动作男星裴渡组里被骂。片方回沟通问题，现场录音还在转。裴渡本人还没出声。', tone: 'bad' },
+  { id: 'w-wig', text: '当红女星江晚宁古装假发的现场照片先出了，边缘看得出来。妆造连夜发长文，说等正片，评论已经在笑头套。', tone: 'mixed' },
+  { id: 'w-seat2', text: '颁奖季座位表流出来。影后陈晚秋在第一排，新锐女演员白疏影在侧边。跟拍的人比名单先吵谁该坐哪。', tone: 'mixed' },
+  { id: 'w-collapse', text: '流量小生陆承宴那段录音还没鉴定完，代言已经撤了三支。品牌说合同到期，评论说那是赶紧撇清。', tone: 'bad' },
+  { id: 'w-oldlove', text: '一线男星韩迟旧恋情录音流出来。他这边说酒桌玩笑，女方工作室连夜切割，说不认识现在的他。', tone: 'bad' },
+  { id: 'w-cutstudio', text: '流量小生陆承宴工作室发声明，说和他不是一伙的。他本人过了三条热搜才转发，粉丝已经撕开了。', tone: 'bad' },
+  { id: 'w-livefail', text: '红毯女星顾辞晚直播连麦，把提词器念出声了。对面没关麦，那几秒被剪出去，品牌先把回放关了。', tone: 'mixed' },
+  { id: 'w-showfail', text: '红毯女星顾辞晚走秀踩空。品牌先删视频，路人先截了原片。她后来发了没修的现场，评论还是在循环那一下。', tone: 'mixed' },
+  { id: 'w-nbrush', text: '影后陈晚秋的旧剧被翻出来连着刷。弹幕全是在找现在的她，原班人马在骂滚去播新的。', tone: 'mixed' },
+  { id: 'w-biao', text: '当红女星江晚宁新剧海报一出，评论只记得影后陈晚秋十年前那部。片方说这次不靠旧的活，原著粉不买账。', tone: 'mixed' },
+  { id: 'w-runner', text: '新锐女演员白疏影第五次陪跑。她笑着说提名就是认可，镜头切到旁边空着的座位。颁奖礼回放把这句留了。', tone: 'mixed' },
+  { id: 'w-vote', text: '流量小生陆承宴在一个年度人气投票里排第一。倒计时还没走完，有人把后台截图发出来：票数一下跳几十万，不像真人点的。主办方说系统波动，但名次已经定了，改不了。', tone: 'bad' },
+  { id: 'w-sub', text: '字幕组把长剧女主宋知夏的情话译成了口号。原著粉连夜出对照，官方还在用译错的那版。', tone: 'mixed' },
+  { id: 'w-cam', text: '沈照组的拍摄机位被抓到。组里清场，跟拍的人在停车场对骂是谁把地址泄出去的。', tone: 'mixed' },
+  { id: 'w-split', text: '流量小生陆承宴和当红女星江晚宁的宣传片子分开发。官方账号隔了十一分钟，两边都说被冷。谁也不解释。', tone: 'mixed' },
+  { id: 'w-namejoke', text: '当红女星江晚宁的角色名被谐音梗玩疯。她发了澄清，梗比澄清跑得快，连主持人都在念那个错的。', tone: 'mixed' },
+  { id: 'w-table', text: '酒桌座位表流出来。导演盛宴坐主位，流量小生陆承宴倒酒，比剧情还细。有人说杀青宴，有人说不是。', tone: 'mixed' },
+  { id: 'w-copy', text: '版权方换人。当红女星江晚宁那部的粉丝图和视频全下架，大家连夜存图。官方只说配合调整。', tone: 'mixed' },
+  { id: 'w-throw', text: '一线男星韩迟的应援物被扔出场。安保说按规定，粉丝连夜说不粉了。他工作室回了一句配合现场，更吵了。', tone: 'bad' },
+  { id: 'w-behind', text: '影后陈晚秋一段花絮比正片好看。正片评论区在求导演去看花絮组，官方账号转了剧照，没转那段。', tone: 'good' },
+  { id: 'w-revive', text: '选秀复活位票数一夜翻倍。节目组说是海外票，骂的人说那是房间里刷的。倒数计时已经走完，名次改不了。', tone: 'bad' },
+  { id: 'w-ghost', text: '代拍号被揭穿。同一张「偶遇一线男星韩迟」出现在三个城市，定位还开着。账号删帖，截图还在。', tone: 'mixed' },
+  { id: 'w-pr', text: '公关稿把当红女星江晚宁写成了新锐女演员白疏影。十分钟删帖，截图已经进了广场。两边粉丝先吵是谁的团队写的。', tone: 'mixed' },
+  { id: 'w-starferry', text: '裴衡在拍大IP网剧《星河渡》。嘉尚影业的S级，上神渡劫，小仙进天界。提前点播的预告先出了女二。一半说原著就是这样，一半说又改成恶毒女二。', tone: 'mixed' },
+  { id: 'w-starcast', text: '裴衡在拍大IP网剧《星河渡》。嘉尚影业的S级。选角名单漏了：江晚宁女主、陆承宴上神，女二那栏还空着。原著粉连夜列出不能改的人设。', tone: 'mixed' },
+  { id: 'w-starwig', text: '裴衡在拍大IP网剧《星河渡》。嘉尚影业的S级。服装造型的现场照片先出了，假发套边缘看得出来，妆造连夜发长文，说等正片。', tone: 'mixed' },
+  { id: 'w-snowbanquet', text: '邢未在拍古装权谋《庭前雪》。浪潮时代的A级网剧。对词传出联姻宴席：女三不用打架，只敬酒和落座。有人说难演。', tone: 'mixed' },
+  { id: 'w-sweetclip', text: '赵浅在拍甜宠《请你偏爱》。提前点播只剪了退婚。切片号在等摘戒指那一下，女三换了几轮。', tone: 'mixed' },
+  { id: 'w-goldtable', text: '《金座》在拍滨江夜宴。投资人把项目按在转盘边上谈。酒桌戏先传出去了，女三那席还没定。', tone: 'mixed' },
+  { id: 'w-coat', text: '齐衡在拍医疗剧《白大褂》。嘉尚影业的A级，三甲急诊。医学顾问已经进组，口型、病历、推床路线都要过。齐衡不爱重来。', tone: 'mixed' },
+  { id: 'w-noise', text: '闻疏在拍都市剧《白噪音》。嘉尚影业的A级，写字楼里一家心理门诊。围读流出几页，没有血腥，全是谈话。', tone: 'mixed' },
+  { id: 'w-north', text: '老钱在拍电影《北站》。嘉尚影业的S级，春运，广播室通宵念延误。车站是真的，广播词改了十一稿。有人说能进预告。', tone: 'mixed' },
+  { id: 'w-summerip', text: '陆深在拍青春网剧《盛夏未完》。浪潮时代的B级，音乐学院。琴房加练的现场照片先出了，唱的是现场还是后期配的，评论已经吵开了。', tone: 'mixed' },
+  { id: 'w-unclewater', text: '《我的二舅爷》预告出了通水那天。弹幕在刷我们县也是这样过来的。不是女主戏，是那种看着像自家的戏。', tone: 'good' },
+  { id: 'w-unnameddoor', text: '沈照在拍文艺电影《未命名》。星汉文化的S级，旧书店，几乎没有台词。不让探班，跟拍的人只拍到一箱退货的书。圈里当冲奖看。', tone: 'mixed' },
+  { id: 'w-cpmeet', text: '《对手戏》拍会议室对吵。现场照片先出了，弹幕已经在嗑，官配粉已经在骂又发糖。', tone: 'mixed' },
+  { id: 'w-pepper', text: '《椒房春》还在选女二蕙嫔。后宫、年家、更衣。圈里拿它跟一部在宫里活十年的戏比。', tone: 'mixed' },
+  { id: 'w-redcase', text: '《赤焰案》围读流出拒婚词。梁郡主挂帅，不是来联姻的。女主还在试。', tone: 'mixed' },
+  { id: 'w-dust', text: '沈照在拍电影《隐尘》。西北种地，找女主。片酬低，圈里当冲奖看。', tone: 'mixed' },
+  { id: 'w-youngbook', text: '老钱在拍电影《少年书》。审查盯尺度：校园、录像、保护。片方要拍得不像说教。', tone: 'mixed' },
+  { id: 'w-northwind', text: '邢伟在拍上星剧《风过北河》。已经有人说集数被拉得很长。律师那场，顾问盯口型。', tone: 'mixed' },
+  { id: 'w-returner', text: '《故人归》女主试了三轮。原著粉准备退款。有人和裴衡那部《星河渡》对打热度。', tone: 'mixed' },
+  { id: 'w-shore', text: '沈照在拍电影《岸边》。海边、返乡，找女主。圈里当冲影后看。', tone: 'mixed' },
+  { id: 'w-weiyang', text: '《未央辞》女主还在选。从更衣到掌事。海报一出，评论只记得旧的那部宫里的戏。', tone: 'mixed' },
   { id: 'w-brocade', text: '《锦衣夜》女二盛宜还在选。宅门、嫡庶、女工。原著粉说别写成恶毒嫡姐。', tone: 'mixed' },
-  { id: 'w-longnight', text: '《长夜未明》询问室那场先传。证人不是来解释案情的。真实案件联想已经压了一轮。', tone: 'mixed' },
-  { id: 'w-counter', text: '《柜台》会审来过一轮。药房、仿制药、把药递过玻璃。冲奖向，片酬普通。', tone: 'mixed' },
-  { id: 'w-painted', text: '沈照《扮相》找女主。戏班、真唱。有人说这是今年电影最难的女主。', tone: 'mixed' },
-  { id: 'w-cipher', text: '《密信》试镜要一场把茶端稳。一张脸两套话。会审已经改了两稿。', tone: 'mixed' },
+  { id: 'w-longnight', text: '《长夜未明》询问室那场先传。证人不是来解释案情的。真案件的联想已经压了一轮。', tone: 'mixed' },
+  { id: 'w-counter', text: '老钱在拍电影《柜台》。审查来过一轮。药房把仿制药递过玻璃。冲奖，片酬普通。', tone: 'mixed' },
+  { id: 'w-painted', text: '沈照在拍电影《扮相》。戏班、真唱，找女主。有人说这是今年电影最难的女主。', tone: 'mixed' },
+  { id: 'w-cipher', text: '邢未在拍电影《密信》。试镜要一场把茶端稳。一张脸两套话。审查已经改了两稿。', tone: 'mixed' },
   { id: 'w-citylamp', text: '《城中灯》贺岁档要笑，片方要别演成鸡汤。女主还空着。', tone: 'mixed' },
+  { id: 'w-teahouse', text: '《茶酒录》温酒那场围读流出来。酒牌不是花瓶掌柜。市井古装，不靠宫斗。', tone: 'mixed' },
+  { id: 'w-sideline', text: '《旁观录》夜账先传。内库女二还空着。有人当轻喜，成片要她把钥匙留下。', tone: 'mixed' },
+  { id: 'w-loopbus', text: '老钱在拍网剧《循环线》。审查来过。同一趟车，女二不是来解释规则的。', tone: 'mixed' },
+  { id: 'w-supper', text: '《晚饭以后》预告出了晚饭那一桌。弹幕在刷我家也是这样。女二还空着。', tone: 'mixed' },
+  { id: 'w-phototime', text: '《旧照》暗房的现场照片先出了。同一张脸两叠照片。原著粉先写成爱情，片方要先把灯关掉。', tone: 'mixed' },
+  { id: 'w-bund', text: '闻疏在拍年代剧《外滩灯》。上海九十年代，夜里的灯。女主还在选，服装造型先传开。', tone: 'mixed' },
+  { id: 'w-rivermouth', text: '《大江口》厂门口预告出了。弹幕在刷我们厂也是这样过来的。女主栏空着。', tone: 'mixed' },
+  { id: 'w-exitvisa', text: '电影《出境》在找女主。窗口、手续。找到的不一定是她要的人。圈里当冲奖看。', tone: 'mixed' },
+  { id: 'w-mythcamp', text: '《祭台》女二还没定。大制作，给国外看的宣传已经在做。质子府别写成诱饵。', tone: 'mixed' },
+  { id: 'w-signedname', text: '邢伟在拍上星剧《署名》。女二检察还空着。顾问盯口型。已经有人说集数被拉得很长。', tone: 'mixed' },
 ]
 
 type PlayerLine = {
@@ -215,7 +235,7 @@ const PLAYER: PlayerLine[] = [
   },
   {
     id: 'p-zhou',
-    text: (n) => `${n} 经纪人很凶？路透录音`,
+    text: (n) => `${n} 经纪人被拍到在片场说话很冲`,
     tone: 'mixed',
     when: (s) => Boolean(s.met.zhouheng) && s.fans >= 1200,
   },
@@ -281,7 +301,7 @@ const PLAYER: PlayerLine[] = [
   },
   {
     id: 'p-nbrush',
-    text: (n) => `${n} 旧物料被翻出来`,
+    text: (n) => `${n} 旧花絮被翻出来`,
     tone: 'mixed',
     when: (s) => s.fans >= 2500 && s.finishedScripts.length > 0,
   },
@@ -300,6 +320,169 @@ type GossipBeat = {
   apply: (s: GameState, optionId: string) => string
 }
 
+type TipCtx = {
+  title: string
+  role: string
+  lead: string
+}
+
+function tipCtx(s: GameState): TipCtx {
+  const b = (s.bookings ?? []).find((x) => x.phase === 'shoot') ?? s.bookings?.[0]
+  const script = b ? scriptById(b.scriptId) : null
+  const from = script ?? (s.finishedScripts.length ? scriptById(s.finishedScripts[s.finishedScripts.length - 1]) : undefined)
+  if (!from) return { title: '', role: '这个角色', lead: '同组那个' }
+  const role = from.roleName === '刀马旦' || from.roleName === '戏班女角' ? '那个翻跟头的客串' : from.roleName
+  return {
+    title: from.title,
+    role,
+    lead: from.leads[0] || '同组那个',
+  }
+}
+
+function inShow(ctx: TipCtx, withTitle: string, without: string) {
+  return ctx.title ? withTitle : without
+}
+
+type TipTape = {
+  id: string
+  scene: string
+  said: (ctx: TipCtx) => string[]
+}
+
+const TIP_TAPES: TipTape[] = [
+  {
+    id: 'lines',
+    scene: '能听出是化妆间，门外有人走过。',
+    said: (ctx) => [
+      inShow(ctx, `《${ctx.title}》这个角色的词写得像说明书。我对着镜子念，自己都想快进。`, '这个角色的词写得像说明书。我对着镜子念，自己都想快进。'),
+      '别发给别人。我就是拍完了发发牢骚。',
+    ],
+  },
+  {
+    id: 'wait',
+    scene: '能听出是片场角落，空调声很响。',
+    said: (ctx) => [
+      inShow(ctx, `《${ctx.title}》候场候到妆都花了。轮到我，镜头扫一下就过。`, '候场候到妆都花了。轮到我，镜头扫一下就过。'),
+      '我不是不干。就是今天有点累。',
+    ],
+  },
+  {
+    id: 'hog',
+    scene: '能听出是楼梯间，声音压得很低。',
+    said: (ctx) => [
+      `${ctx.lead}一条能拍八遍。我不是说人家不好，就是我干等，脸都僵了。`,
+      '这话你当没听见。真传出去我没法进组。',
+    ],
+  },
+  {
+    id: 'nameless',
+    scene: '能听出是停车场，你大概在打电话。',
+    said: (ctx) => [
+      inShow(ctx, `《${ctx.title}》这个${ctx.role}，有的场次连名字都没有。我还练了两天。`, '这个角色有的场次连名字都没有。我还练了两天。'),
+      '我就是说说。你别当真，也别存。',
+    ],
+  },
+  {
+    id: 'toast',
+    scene: '能听出是片场后面，有人在收灯。',
+    said: (ctx) => [
+      inShow(ctx, `《${ctx.title}》这场不打架，就敬酒、落座、把笑挂住。演完妆还在，人已经没了。`, '这场不打架，就敬酒、把笑挂住。演完妆还在，人已经没了。'),
+      '我知道这是工作。就是有点没劲。',
+    ],
+  },
+  {
+    id: 'wig',
+    scene: '能听出是造型间，假发套边在响。',
+    said: (ctx) => [
+      '这顶假发戴一天，头皮都木了。还得对着镜头笑，像没事。',
+      '你别告诉造型。我就是跟你抱怨一下。',
+    ],
+  },
+  {
+    id: 'lunch',
+    scene: '能听出是片场门口，盒饭盖子响了一下。',
+    said: (ctx) => [
+      '盒饭凉了还要补一条笑的。导演说情绪不对，我现在真没什么情绪。',
+      '我不是针对谁。就是今天排得太满。',
+    ],
+  },
+  {
+    id: 'again',
+    scene: '能听出是监视器后面，有人在翻场记。',
+    said: (ctx) => [
+      '再来一条。再来一条。我脸都笑僵了，还说不够自然。',
+      '回去别让经纪人听见。我就是拍完了骂两句。',
+    ],
+  },
+  {
+    id: 'cut',
+    scene: '能听出是回酒店的车上，引擎声很稳。',
+    said: (ctx) => [
+      inShow(ctx, `《${ctx.title}》我这场要是被剪掉，大概也没人问。我自己都快背完别人的词了。`, '我这场要是被剪掉，大概也没人问。我自己都快背完别人的词了。'),
+      '你当我开玩笑。明天还要拍。',
+    ],
+  },
+  {
+    id: 'bg',
+    scene: '能听出是走廊，脚步声过来又走了。',
+    said: (ctx) => [
+      `我这场就是给${ctx.lead}当背景。站得近一点，镜头都不一定收得到。`,
+      '我知道自己什么位置。就是说出来顺口。',
+    ],
+  },
+  {
+    id: 'latepal',
+    scene: '能听出是候场室，有人把椅子拖了一下。',
+    said: (ctx) => [
+      `${ctx.lead}又晚到。我们妆都补完了，还在等。不是第一次。`,
+      '别外传。传出去变成我在骂人。',
+    ],
+  },
+  {
+    id: 'friend',
+    scene: '能听出是卫生间外面，水声刚关。',
+    said: (ctx) => [
+      '我跟你说啊，同组有人一条能磨半天。我不是不服，就是觉得自己像道具。',
+      '说完了。你别笑，也别发给第三个人。',
+    ],
+  },
+]
+
+function pickTipTape(s: GameState): TipTape {
+  const fresh = TIP_TAPES.filter((t) => !s.flags[`tip:${t.id}`])
+  const pool = fresh.length ? fresh : TIP_TAPES
+  const tape = pool[Math.floor(rng(s, 88)() * pool.length)] ?? TIP_TAPES[0]
+  if (fresh.length) s.flags[`tip:${tape.id}`] = true
+  return tape
+}
+
+function tipOpenEvent(s: GameState): GameEvent {
+  const tape = pickTipTape(s)
+  const ctx = tipCtx(s)
+  const lines = [
+    `你点开了。录音不长，${tape.scene}`,
+    ...tape.said(ctx).map((line) => `你说：「${line}」`),
+    '听得出来是你的声音。话说得不太好听，但也没到能把人怎样的程度。听完可以当没这回事。也可以花钱，让他们把话题引到别人身上。第二种不违法，但也不体面。',
+  ]
+  return {
+    id: 'gossip-tip-open',
+    title: '爆料',
+    body: lines.join('\n\n'),
+    lines,
+    options: [
+      { id: 'ignore', label: '当没收到' },
+      { id: 'push', label: '让他们写别人' },
+    ],
+  }
+}
+
+function applyTipPush(s: GameState): string {
+  s.money = Math.max(0, s.money - 6000)
+  s.opinion -= 4
+  s.news = { text: '圈内爆料 指向不明', tone: 'bad', kind: 'gossip' }
+  return '营销号把注意力转向了另一个人。你的名字没有出现，但你很清楚这件事并没有消失。'
+}
+
 const BEATS: GossipBeat[] = [
   {
     id: 'gossip-raw',
@@ -309,7 +492,7 @@ const BEATS: GossipBeat[] = [
       title: '生图',
       body: `活动刚结束，营销号就发了${s.name}的现场照片。角度不太好，脸上也没什么光。
 
-评论里已经有人拿精修图做对比。周衡把链接发过来：「不用为几张照片发声明。你要是想回应，就发张正常自拍；不想管也行，明天就有新的热闹。」`,
+评论里已经有人拿精修图做对比。`,
       options: [
         { id: 'quiet', label: '不回应' },
         { id: 'post', label: '发一张没修的' },
@@ -336,11 +519,9 @@ const BEATS: GossipBeat[] = [
 
 梁时发来消息：「我助理说热搜上有我们。你介意的话，我配合回应。」
 
-过了一会儿，他又补了一句：「不是催你。我这边都行。」
-
-周衡问你，要不要联系平台降热度。`,
+过了一会儿，他又补了一句：「不是催你。我这边都行。」`,
       options: [
-        { id: 'kill', label: '让周衡压下去' },
+        { id: 'kill', label: '压热度' },
         { id: 'leave', label: '当没看见' },
       ],
     }),
@@ -350,7 +531,7 @@ const BEATS: GossipBeat[] = [
         bumpFavor(s, 'liangshi', -4)
         bumpFavor(s, 'zhouheng', 3)
         s.news = { text: `${s.name} 工作室回应机场路透`, tone: 'mixed', kind: 'hot' }
-        return '周衡联系平台降了热度。梁时回了一句“知道了”，之后没再提。'
+        return '热度被压了下去。梁时回了一句“知道了”，之后没再提。'
       }
       s.fans += 420
       bumpFavor(s, 'liangshi', 5)
@@ -362,12 +543,12 @@ const BEATS: GossipBeat[] = [
   {
     id: 'gossip-resource',
     when: (s) => s.identity === 'rich' || (s.met.guyan && s.fans >= 2000),
-    event: (s) => ({
+    event: () => ({
       id: 'gossip-resource',
       title: '资源咖',
       body: `有人把你坐过的车、最近进的组和一张模糊的饭局照片拼在一起，发了条长微博，问你背后到底是谁。
 
-${s.met.zhouheng ? '周衡看完以后说：「家里的事没必要交代。可以发最近的工作记录，也可以不回应。你自己选。」' : '评论区已经替你编出了好几个版本。'}`,
+评论区已经替你编出了好几个版本。`,
       options: [
         { id: 'work', label: '只发通告照' },
         { id: 'fight', label: '让他们写' },
@@ -396,9 +577,7 @@ ${s.met.zhouheng ? '周衡看完以后说：「家里的事没必要交代。可
       title: '两家',
       body: `许宁的粉丝先指责你借同组关系炒作。你的粉丝很快反击，说片场镜头本来就不属于谁。
 
-两边开始翻旧路透。有一张你让位，有一张她抢戏。真假已经不重要。
-
-周衡打来电话：「两边工作室可以一起发句话，也可以先冷处理。你想怎么做？」`,
+两边开始翻旧路透。有一张你让位，有一张她抢戏。真假已经不重要。`,
       options: [
         { id: 'pay', label: '花钱压一压' },
         { id: 'open', label: '让他们吵' },
@@ -430,9 +609,7 @@ ${s.met.zhouheng ? '周衡看完以后说：「家里的事没必要交代。可
         title: '盒饭',
         body: `有人拍到你在《${title}》片场吃盒饭。你坐在道具箱旁边，头发还保持着上一场戏的造型。
 
-营销号夸你“接地气”，评论里也有人觉得只是普通工作照。
-
-周衡把照片发给你：「拍得还行。想转就转，不想转也不用配合。」`,
+营销号夸你“接地气”，评论里也有人觉得只是普通工作照。`,
         options: [
           { id: 'post', label: '转了，配一句好饿' },
           { id: 'quiet', label: '当没看见' },
@@ -458,9 +635,7 @@ ${s.met.zhouheng ? '周衡看完以后说：「家里的事没必要交代。可
       title: '迟到',
       body: `有人发帖说你昨天迟到，让全组等了很久。
 
-你记得自己踩着通告时间进门，没有提前，但也没有迟到。帖子里没有完整视频，只有一张工作人员看表的照片。
-
-周衡找到当天的进场记录：「可以把时间发出去。也可以不理，但这口锅暂时会在你头上。」`,
+你记得自己踩着通告时间进门，没有提前，但也没有迟到。帖子里没有完整视频，只有一张工作人员看表的照片。当天的进场记录还在。`,
       options: [
         { id: 'deny', label: '发通告时间截图' },
         { id: 'quiet', label: '不解释' },
@@ -519,9 +694,7 @@ ${s.met.zhouheng ? '周衡看完以后说：「家里的事没必要交代。可
       title: '口误',
       body: `采访时，你把一部旧剧的导演名字念错了。原视频里只有半秒，很快被人单独剪出来，放慢重播了三遍。
 
-评论里有人纠正读音，也有人说你根本没做功课。
-
-周衡问你要不要直接认错。`,
+评论里有人纠正读音，也有人说你根本没做功课。`,
       options: [
         { id: 'sorry', label: '发一条：是我念错了' },
         { id: 'quiet', label: '当音轨问题' },
@@ -580,9 +753,7 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
       title: '两篇稿',
       body: `同一天，两个营销号用了同一张路透。一个夸你状态好、资源稳，另一个说你后续乏力、很快会被新人替代。
 
-周衡把对方的报价截图发来：「都是收钱写稿。可以买一篇正常的工作宣传，也可以一篇都不碰。」
-
-她又提醒了一句：「买了不保证没人骂，只是让真正的通告别被这些话盖住。」`,
+两边都是收钱写稿。可以买一篇正常的工作宣传，也可以一篇都不碰。买了不保证没人骂，只是让真正的通告别被这些话盖住。`,
       options: [
         { id: 'buy', label: '买一条工作向的' },
         { id: 'leave', label: '让他们自己打' },
@@ -607,27 +778,38 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
     event: () => ({
       id: 'gossip-tip',
       title: '爆料',
-      body: `一个营销号私信你，说手里有别的剧组的录音，问你想不想提前听。
+      body: `一个营销号私信你，说手里有一段你片场的录音，问你想不想先听。
 
-周衡看完直接说：「链接别点。要么当没收到，要么花钱让他们把话题引到别人身上。」
-
-她把手机放回你面前：「第二种做法不违法，但也不体面。你自己决定。」`,
+后面跟了一个链接。`,
       options: [
-        { id: 'ignore', label: '当没收到' },
-        { id: 'push', label: '让他们写别人' },
+        { id: 'skip', label: '不点' },
+        { id: 'open', label: '点开' },
       ],
     }),
     apply: (s, optionId) => {
-      if (optionId === 'push') {
-        s.money = Math.max(0, s.money - 6000)
-        s.opinion -= 4
-        if (s.met.zhouheng) bumpFavor(s, 'zhouheng', -2)
-        s.news = { text: '圈内爆料 指向不明', tone: 'bad', kind: 'gossip' }
-        return '营销号把注意力转向了另一个人。你的名字没有出现，但你很清楚这件事并没有消失。'
+      if (optionId === 'open') {
+        s.event = tipOpenEvent(s)
+        return '链接打开了。'
       }
+      if (optionId === 'push') {
+        return applyTipPush(s)
+      }
+      return '你没点。过了几个小时，对方撤回了消息。'
+    },
+  },
+  {
+    id: 'gossip-tip-open',
+    when: () => false,
+    event: () => ({
+      id: 'gossip-tip-open',
+      title: '爆料',
+      body: '',
+      options: [],
+    }),
+    apply: (s, optionId) => {
+      if (optionId === 'push') return applyTipPush(s)
       s.mood = clamp(s.mood - 2, 0, 108)
-      if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 2)
-      return '你没有回复，也没有点开链接。过了几个小时，对方撤回了消息。'
+      return '你听完了，没有回。过了几个小时，对方撤回了消息。'
     },
   },
   {
@@ -640,7 +822,7 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
         title: '花絮',
         body: `《${title}》的一段未公开花絮被人传了出来。视频里有你笑场、和同组演员对词，也有被导演叫停重来的画面。
 
-评论意外不错，很多人说比正式预告更有意思。官博来问，要投诉删除，还是顺势当作预热。`,
+评论意外不错，很多人说比正式预告更有意思。官方账号来问，要投诉删除，还是顺势当作预热。`,
         options: [
           { id: 'keep', label: '当预热' },
           { id: 'cut', label: '让他们删' },
@@ -651,7 +833,7 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
       if (optionId === 'keep') {
         s.fans += 320
         s.news = { text: `${s.name} 花絮流出`, tone: 'good', kind: 'hot' }
-        return '官博没有删，还转发了一张正式剧照。有人顺着花絮开始关注这部戏。'
+        return '官方账号没有删，还转发了一张正式剧照。有人顺着花絮开始关注这部戏。'
       }
       if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 2)
       return '泄露的视频很快被删除，但已经有人保存下来，偶尔还会在评论区出现。'
@@ -668,11 +850,9 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
         title: '翻出来',
         body: `最近有人重新看《${title}》，把你的几场戏剪到了一起。
 
-弹幕里有人第一次注意到你，也有人拿当时的造型和现在比较。
-
-周衡问要不要联系官博转发旧物料，让这波讨论持续久一点。`,
+弹幕里有人第一次注意到你，也有人拿当时的造型和现在比较。`,
         options: [
-          { id: 'repost', label: '让官博转旧物料' },
+          { id: 'repost', label: '让官方转旧花絮' },
           { id: 'quiet', label: '不掺和' },
         ],
       }
@@ -681,7 +861,7 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
       if (optionId === 'repost') {
         s.fans += 240
         s.news = { text: `${s.name} 旧作为什么火了`, tone: 'mixed', kind: 'gossip' }
-        return '官博转发了旧花絮。有人开始补剧，也有人嫌团队太会抓热度。'
+        return '官方账号转发了旧花絮。有人开始补剧，也有人嫌团队太会抓热度。'
       }
       return '你没有参与。那支剪辑自然传播了几天，给你带来了一些新关注。'
     },

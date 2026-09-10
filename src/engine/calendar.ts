@@ -135,26 +135,24 @@ function calKey(week: number, id: string): string {
   return `cal:${id}:${seasonYear(week)}`
 }
 
-function yearAwardCount(state: GameState, week = state.week): number {
-  const year = seasonYear(week)
-  const start = (year - 1) * YEAR_WEEKS + 1
-  const end = year * YEAR_WEEKS
-  return (state.awards ?? []).filter((a) => a.week >= start && a.week <= end).length
+function workWonSeason(state: GameState, scriptId: string, seasonId: string): boolean {
+  return (state.awards ?? []).some((a) => a.scriptId === scriptId && a.id === `win:${seasonId}:${scriptId}`)
 }
 
-function bestAwardWork(state: GameState, kind: SeasonKind) {
+function bestAwardWork(state: GameState, ev: SeasonEvent) {
   const works = (state.workLog ?? []).filter((w) => {
     const s = scriptById(w.scriptId)
     if (!s?.awardTrack) return false
-    if (kind === 'film-award') return /电影|微电影/.test(s.type)
-    if (kind === 'tv-award') return /剧/.test(s.type) && !/电影/.test(s.type)
+    if (workWonSeason(state, w.scriptId, ev.id)) return false
+    if (ev.kind === 'film-award') return /电影|微电影/.test(s.type)
+    if (ev.kind === 'tv-award') return /剧/.test(s.type) && !/电影/.test(s.type)
     return false
   })
   return works.slice().sort((a, b) => b.score - a.score)[0] ?? null
 }
 
 function evaluateNomination(state: GameState, ev: SeasonEvent): CeremonyDue {
-  const work = bestAwardWork(state, ev.kind)
+  const work = bestAwardWork(state, ev)
   const base: CeremonyDue = {
     seasonId: ev.id,
     week: state.week,
@@ -166,7 +164,6 @@ function evaluateNomination(state: GameState, ev: SeasonEvent): CeremonyDue {
     name: ev.name,
   }
   if (ev.kind === 'fashion' || !ev.awardName) return base
-  if (yearAwardCount(state) >= 1) return base
   if (!work) return base
   const script = scriptById(work.scriptId)
   if (!script) return base

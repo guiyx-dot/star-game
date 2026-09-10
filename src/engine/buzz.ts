@@ -26,12 +26,12 @@ const ANNOUNCE: Record<string, (name: string) => string> = {
   whitenoise: (n) => `${n} 进组《白噪音》。心理门诊前台。`,
   peppercourt: (n) => `${n} 确认《椒房春》蕙嫔。后宫女二。`,
   redcase: (n) => `${n} 确认《赤焰案》梁郡主。`,
-  dust: (n) => `${n} 进组沈照《隐尘》。女主。冲奖向。`,
+  dust: (n) => `${n} 进组沈照《隐尘》。女主。冲奖。`,
   youngbook: (n) => `${n} 进组《少年书》女二。`,
   northwind: (n) => `${n} 出演《风过北河》律师。`,
   returner: (n) => `${n} 确认《故人归》女主。大 IP。`,
   weiyang: (n) => `${n} 确认《未央辞》女主。`,
-  shore: (n) => `${n} 进组沈照《岸边》。女主。冲影后向。`,
+  shore: (n) => `${n} 进组沈照《岸边》。女主。冲影后。`,
   ninegates: (n) => `${n} 确认《九重门》女主。`,
   'people-sea': (n) => `${n} 出演《人海》周蓉。`,
   sister: (n) => `${n} 进组《她的小孩》女主。`,
@@ -39,9 +39,38 @@ const ANNOUNCE: Record<string, (name: string) => string> = {
   longnight: (n) => `${n} 进组《长夜未明》。询问室里那个不说话的人。`,
   counter: (n) => `${n} 进组《柜台》女二。药房那场。`,
   nightward: (n) => `${n} 进组《白夜班》。外科值班。`,
-  painted: (n) => `${n} 进组沈照《扮相》。女主。冲影后向。`,
+  painted: (n) => `${n} 进组沈照《扮相》。女主。冲影后。`,
   cipher: (n) => `${n} 确认《密信》女主。一张脸两套话。`,
   citylamp: (n) => `${n} 确认《城中灯》女主。`,
+  teahouse: (n) => `${n} 确认《茶酒录》酒牌。市井女二。`,
+  sideline: (n) => `${n} 确认《旁观录》内库。`,
+  loopbus: (n) => `${n} 进组《循环线》女二。车上那个把人拉开的人。`,
+  twonight: (n) => `${n} 进组《双面夜》。法医。`,
+  truthfile: (n) => `${n} 进组《卷宗里》女二。`,
+  supper: (n) => `${n} 出演《晚饭以后》女二。先出社会的那个。`,
+  sixfloor: (n) => `${n} 出演《六号楼》三零二。`,
+  listing: (n) => `${n} 出演《挂牌》女二。带看。`,
+  innnight: (n) => `${n} 出演《同福夜》跑堂。`,
+  sketch: (n) => `${n} 进组《画像》女二。画像师。`,
+  listenwind: (n) => `${n} 确认《听风楼》女二。`,
+  audit: (n) => `${n} 出演《造价》女二。把数算完的人。`,
+  phototime: (n) => `${n} 进组《旧照》女二。照相馆。`,
+  bund: (n) => `${n} 确认《外滩灯》女主。`,
+  rivermouth: (n) => `${n} 确认《大江口》女主。`,
+  yanfu: (n) => `${n} 进组《严府灯》。严府里那个女人。`,
+  lawful: (n) => `${n} 进组《正当》女二。把话送到法庭的人。`,
+  changan: (n) => `${n} 进组沈照《长安信》。送行那场。`,
+  exitvisa: (n) => `${n} 进组《出境》。女主。冲奖。`,
+  troupe: (n) => `${n} 出演《文工团》女二。伴舞。`,
+  northland: (n) => `${n} 进组《北疆风》。牧场那场。`,
+  county: (n) => `${n} 出演《大院》女二。秘书。`,
+  shnight: (n) => `${n} 进组《夜谈》女二。饭局里的人。`,
+  mythcamp: (n) => `${n} 确认《祭台》女二。质子府。`,
+  cliff: (n) => `${n} 进组《冰崖》女二。接头的人。`,
+  zhengyang: (n) => `${n} 确认《正阳门》女主。`,
+  signedname: (n) => `${n} 确认《署名》女二。检察。`,
+  along: (n) => `${n} 确认《沿途》女主。`,
+  oldwine: (n) => `${n} 出演《老酒》女二。柜上的人。`,
 }
 
 export function announceFor(name: string, script: ScriptDef): NewsFlash {
@@ -89,6 +118,36 @@ const WRAP: Record<string, (name: string) => string> = {
   counter: (n) => `${n} 《柜台》获点名。递药那场不用哭。`,
   painted: (n) => `${n} 《扮相》获点名。唱段那场有人说能进女主。`,
   cipher: (n) => `${n} 《密信》获点名。端茶那场还在被剪。`,
+  citylamp: (n) => `${n} 《城中灯》收官。过年那场还在被讨论。`,
+  teahouse: (n) => `${n} 《茶酒录》收官。温酒那场还在被讨论。`,
+  sideline: (n) => `${n} 《旁观录》收官。夜账那场有人说像真的。`,
+  loopbus: (n) => `${n} 《循环线》获点名。车上那场不用哭。`,
+  twonight: (n) => `${n} 《双面夜》收官。报告那场有人说像真的。`,
+  truthfile: (n) => `${n} 《卷宗里》获点名。复印件那场不用哭。`,
+  supper: (n) => `${n} 《晚饭以后》收官。晚饭那一桌还在被剪。`,
+  sixfloor: (n) => `${n} 《六号楼》收官。楼道那场还在转。`,
+  listing: (n) => `${n} 《挂牌》收官。带看那场有人说像真的。`,
+  innnight: (n) => `${n} 《同福夜》收官。把灯吹灭那场还在被讨论。`,
+  sketch: (n) => `${n} 《画像》收官。把像交出去那场还在被剪。`,
+  listenwind: (n) => `${n} 《听风楼》收官。袖口那场还在被讨论。`,
+  audit: (n) => `${n} 《造价》收官。表格那场有人说像真的。`,
+  phototime: (n) => `${n} 《旧照》收官。暗房那场还在吵。`,
+  bund: (n) => `${n} 《外滩灯》收官。夜里的灯还在被剪。`,
+  rivermouth: (n) => `${n} 《大江口》收官。厂门口那场有人反复看。`,
+  yanfu: (n) => `${n} 《严府灯》获点名。拨灯那场不用哭。`,
+  lawful: (n) => `${n} 《正当》获点名。法庭那场有人说像真的。`,
+  changan: (n) => `${n} 《长安信》获点名。送行那场不用哭。`,
+  exitvisa: (n) => `${n} 《出境》获点名。窗口那场有人说能进女主。`,
+  troupe: (n) => `${n} 《文工团》收官。练功房那场还在被剪。`,
+  northland: (n) => `${n} 《北疆风》获点名。风那场有人说像真的。`,
+  county: (n) => `${n} 《大院》收官。会议那场还在被讨论。`,
+  shnight: (n) => `${n} 《夜谈》获点名。饭局那场不用哭。`,
+  mythcamp: (n) => `${n} 《祭台》收官。礼那场还在被吵。`,
+  cliff: (n) => `${n} 《冰崖》获点名。接头那场还在被剪。`,
+  zhengyang: (n) => `${n} 《正阳门》收官。门口那一桌还在被讨论。`,
+  signedname: (n) => `${n} 《署名》收官。签字那场有人说像真的。`,
+  along: (n) => `${n} 《沿途》收官。到站那场还在被剪。`,
+  oldwine: (n) => `${n} 《老酒》收官。柜上那场还在被讨论。`,
 }
 
 export function wrapNewsFor(name: string, script: ScriptDef, score: number, violated: boolean): NewsFlash | null {
@@ -148,7 +207,7 @@ const RUMOR_TALK: Record<string, { user: string; text: string }[]> = {
   ],
   snowcourt: [
     { user: '原著粉', text: '小郡主不是花瓶。宴席上谁先落座，是戏。' },
-    { user: '路透', text: '头面比人先出圈。成片为准？先信了。' },
+    { user: '路透', text: '头上的饰品比人先出圈。等正片？先信了。' },
   ],
   sweet: [
     { user: '切片账号', text: '就等摘戒指那一下。女三换了几轮了。' },
@@ -187,7 +246,7 @@ const RUMOR_TALK: Record<string, { user: string; text: string }[]> = {
   ],
   counter: [
     { user: '影评号', text: '递药那场，评委会盯手。广场会先骂。' },
-    { user: '行业帖', text: '片酬低，冲奖向。顾问组盯药名。' },
+    { user: '行业帖', text: '片酬低，冲奖。顾问盯药名。' },
   ],
   painted: [
     { user: '影评号', text: '真唱。才艺过不了直接停。冲影后。' },
@@ -199,6 +258,46 @@ const RUMOR_TALK: Record<string, { user: string; text: string }[]> = {
   goldseat: [
     { user: '行业帖', text: '滨江夜宴。顾宴川投的，女三不是花瓶。' },
     { user: '匿名', text: '酒桌戏像真的，还是像通稿，播出才知道。' },
+  ],
+  teahouse: [
+    { user: '原著粉', text: '酒牌别演成花瓶掌柜。把日子做成手艺。' },
+    { user: '行业帖', text: '市井古装，不靠宫斗。白玉兰会不会看，看成片。' },
+  ],
+  sideline: [
+    { user: '行业帖', text: '朝堂旁观。内库夜账。轻，不等于没骨头。' },
+    { user: '原著粉', text: '别写成爱上男主就把钥匙交出去。' },
+  ],
+  loopbus: [
+    { user: '影评号', text: '同一趟车。女二不是来解释规则的。' },
+    { user: '路人', text: '又是循环。先看她像不像在车上坐过。' },
+  ],
+  phototime: [
+    { user: '原著粉', text: '同一张脸两叠照片。别先写成甜。' },
+    { user: '路人', text: '照相馆那个，认不认得，看成片。' },
+  ],
+  bund: [
+    { user: '行业帖', text: '上海九十年代。服装造型会先传开，人要后到。' },
+    { user: '路人', text: '又是夜和灯。先看她像不像把生意谈完。' },
+  ],
+  rivermouth: [
+    { user: '路人', text: '厂门口那种。像真的厂，不是土味短剧。' },
+    { user: '行业帖', text: '三十年账。女主要能把年龄演开。' },
+  ],
+  mythcamp: [
+    { user: '原著粉', text: '质子府别写成诱饵。礼要做完。' },
+    { user: '匿名', text: '资本要脸，导演要那场不说话的戏。' },
+  ],
+  signedname: [
+    { user: '行业帖', text: '检察署名。顾问组盯口型。' },
+    { user: '路人', text: '又是年度剧。先看集数会不会被拉得很长。' },
+  ],
+  lawful: [
+    { user: '影评号', text: '法庭那场，评委会盯法条。广场会先骂。' },
+    { user: '行业帖', text: '片酬普通，冲奖。' },
+  ],
+  exitvisa: [
+    { user: '影评号', text: '窗口那场不用哭。找到的不一定是她要的。' },
+    { user: '路人', text: '又是找人。先看她像不像在窗口站过。' },
   ],
   cpheat: [
     { user: '切片账号', text: '需求会对吵那场会先火。男二是梁时。' },
@@ -217,7 +316,7 @@ const RUMOR_TALK: Record<string, { user: string; text: string }[]> = {
 
 const CAST_TALK: Record<string, (name: string) => { user: string; text: string }[]> = {
   starriver: (n) => [
-    { user: '粉籍', text: `女二是${n}？你们认真的。原著人设碰了三件不能碰的。` },
+    { user: '原著粉', text: `女二是${n}？你们认真的。原著人设碰了三件不能碰的。` },
     { user: '原著粉', text: '脸可以。别演成恶毒女二就行。' },
     { user: '营销号', text: `${n} 官宣《星河渡》女二。截图转。` },
   ],
@@ -230,7 +329,7 @@ const CAST_TALK: Record<string, (name: string) => { user: string; text: string }
   ],
   cpheat: (n) => [
     { user: '切片账号', text: `${n}和梁时。需求会那场先剪。` },
-    { user: '黑', text: '又一个没试镜就进组的？' },
+    { user: '骂的人', text: '又一个没试镜就进组的？' },
   ],
   intern: (n) => [
     { user: '行业帖', text: `${n}演陈慈。走廊里被喊去推床的那个。` },
@@ -241,7 +340,7 @@ const DONE_TALK: Record<string, (name: string) => { user: string; text: string }
   starriver: (n) => [
     { user: '看过的', text: `${n}那个女二，爱得难看，但能看懂她在换什么。` },
     { user: '原著粉', text: '还行。没有写成工具人。' },
-    { user: '黑', text: '抢女主戏。典型。' },
+    { user: '骂的人', text: '抢女主戏。典型。' },
   ],
   unnamed: (n) => [
     { user: '影评号', text: `颁奖季会不会提${n}，现在说还早。书店那场有人反复看。` },
@@ -287,9 +386,9 @@ export function buzzComments(script: ScriptDef, name: string, phase: 'rumor' | '
     rows.push(...(CAST_TALK[script.id]?.(name) ?? []))
     if (!CAST_TALK[script.id] && (script.roleTier === 'second' || script.roleTier === 'lead')) {
       rows.push(
-        { user: '粉籍', text: `女二是${name}？你们认真的。` },
+        { user: '原著粉', text: `女二是${name}？你们认真的。` },
         { user: '营销号', text: `${name} 官宣了。截图转。` },
-        { user: '黑', text: '又一个没试镜就进组的？' },
+        { user: '骂的人', text: '又一个没试镜就进组的？' },
       )
     }
     if (script.roleTier === 'support' || script.roleTier === 'cameo') {
@@ -305,7 +404,7 @@ export function buzzComments(script: ScriptDef, name: string, phase: 'rumor' | '
   if (!DONE_TALK[script.id] && (script.roleTier === 'second' || script.roleTier === 'lead')) {
     rows.push(
       { user: '粉', text: `${role}这段我反复看。` },
-      { user: '黑', text: '抢女主戏。典型。' },
+      { user: '骂的人', text: '抢女主戏。典型。' },
       { user: '路人', text: `我是冲${role}进来的。` },
     )
   }

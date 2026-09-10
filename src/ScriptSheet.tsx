@@ -43,7 +43,7 @@ export function ScriptSheet({
           {script.tags.map((t) => (
             <span key={t}>{t}</span>
           ))}
-          {script.awardTrack ? <span>冲奖向</span> : null}
+          {script.awardTrack ? <span>冲奖</span> : null}
         </div>
       </header>
       <div className="invite-grid">

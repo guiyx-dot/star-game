@@ -46,6 +46,7 @@ import {
   type ActionId,
   type Attrs,
   type Booking,
+  type EventSheet,
   type GameEvent,
   type GameState,
   type IdentityId,
@@ -191,13 +192,7 @@ function houseMoodMax(state: GameState): number {
 }
 
 function growAttr(cur: number, raw: number): number {
-  if (raw <= 0) return clamp(cur + raw, 0, ATTR_MAX)
-  let g = raw
-  if (cur >= 180) g = 0
-  else if (cur >= 150) g = raw >= 3 ? 1 : 0
-  else if (cur >= 120) g = Math.min(1, raw)
-  else if (cur >= 100) g = Math.min(2, raw)
-  return clamp(cur + g, 0, ATTR_MAX)
+  return clamp(cur + raw, 0, ATTR_MAX)
 }
 
 function addAttr(state: GameState, patch?: Partial<Attrs>) {
@@ -927,12 +922,39 @@ function inviteEvent(script: ScriptDef): GameEvent {
   }
 }
 
+function yuan(n: number): string {
+  if (Math.abs(n) >= 10000) return `${(n / 10000).toFixed(1)}万`
+  return `${n}元`
+}
+
+export const SIGN_TALK = '周衡把笔放在桌上，「确定时间排得开，再签。」'
+
+export function contractSheet(script: ScriptDef): EventSheet {
+  const rest = Math.max(0, script.pay - script.deposit)
+  const time = [
+    `拍摄 ${script.shootNeed} 场，${script.deadlineDays} 天内完成`,
+    script.promoNeed ? `宣传 ${script.promoNeed} 场，杀青后 ${script.promoDays} 天内完成` : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
+  return {
+    heading: `《${script.title}》`,
+    rows: [
+      { label: '角色', value: `${script.roleName} · ${script.roleKind}` },
+      { label: '通告时间', value: time },
+      { label: '定金', value: script.deposit > 0 ? yuan(script.deposit) : '无' },
+      { label: '尾款', value: rest > 0 ? yuan(rest) : '无' },
+    ],
+  }
+}
+
 function signEvent(script: ScriptDef): GameEvent {
-  const dep = script.deposit > 0 ? `定金：${script.deposit}元` : '没有定金。'
   return {
     id: 'sign',
     title: '通告签约',
-    body: `周衡把合同翻到工期和违约条款，一项项念给你听。\n\n《${script.title}》\n\n角色：${script.roleName} · ${script.roleKind}\n\n${dep}\n\n「不懂的现在问，别回头说没看见。」她把笔放在桌上，「确定时间排得开，再签。」`,
+    body: '',
+    sheet: contractSheet(script),
+    talk: SIGN_TALK,
     scriptId: script.id,
     options: [
       { id: 'abort', label: '把笔放下' },
