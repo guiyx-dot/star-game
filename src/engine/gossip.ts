@@ -868,6 +868,260 @@ ${who}先发了后台自拍。很快有人把你们的照片放在一起，评�
       return '你没有参与。那支剪辑自然传播了几天，给你带来了一些新关注。'
     },
   },
+  {
+    id: 'gossip-leak',
+    when: (s) => (s.bookings?.length ?? 0) > 0 && s.fans >= 1500,
+    event: (s) => {
+      const title = filmingTitle(s) ?? '这部戏'
+      return {
+        id: 'gossip-leak',
+        title: '超点',
+        body: `《${title}》还有两集没播，已经有人先丢到网上。弹幕比正片快，剧透号已经开张。
+
+官方还在发敬请期待。评论里有人骂割韭菜，也有人说反正都要播。
+
+法务问你：追不追。`,
+        options: [
+          { id: 'cut', label: '让法务投诉下架' },
+          { id: 'keep', label: '当预热，不追' },
+        ],
+      }
+    },
+    apply: (s, optionId) => {
+      const title = filmingTitle(s) ?? '新剧'
+      if (optionId === 'cut') {
+        s.money = Math.max(0, s.money - 5000)
+        s.opinion = clamp(s.opinion + 2, -40, 40)
+        s.fans = Math.max(0, s.fans - Math.max(60, Math.round(s.fans * 0.015)))
+        s.news = { text: `《${title}》未播集被投诉`, tone: 'mixed', kind: 'hot' }
+        if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 3)
+        return '法务发了投诉。链接少了，路人说心虚。片方回了一句配合处理。'
+      }
+      s.fans += 360
+      s.opinion = clamp(s.opinion - 4, -40, 40)
+      s.hotSearch = { text: `《${title}》被提前点播`, tone: 'mixed', daysLeft: 4 }
+      s.news = { text: `《${title}》被提前点播`, tone: 'mixed', kind: 'hot' }
+      return '你没有追。那两集还在传，追剧的人骂割韭菜，也有人顺着超点开始认识你。'
+    },
+  },
+  {
+    id: 'gossip-cast',
+    when: (s) => (s.bookings?.length ?? 0) > 0 && s.fans >= 1200,
+    event: (s) => {
+      const title = filmingTitle(s) ?? '新组'
+      return {
+        id: 'gossip-cast',
+        title: '内定',
+        body: `有人把《${title}》的候场时间轴发了出来，说你没试镜就进组。时间对得上的人说那是通告，不信的人说那是后补。
+
+经纪公司问：旧试镜还在硬盘里，发不发。`,
+        options: [
+          { id: 'post', label: '把试镜花絮丢出去' },
+          { id: 'quiet', label: '不解释' },
+        ],
+      }
+    },
+    apply: (s, optionId) => {
+      if (optionId === 'post') {
+        s.fans += 140
+        s.mood = clamp(s.mood - 2, 0, 108)
+        s.news = { text: `${s.name} 晒试镜`, tone: 'mixed', kind: 'hot' }
+        if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 2)
+        return '工作室发了试镜那天的片段。大部分人接受，仍有人说是后补的。热度转到「她到底试没试」。'
+      }
+      const loss = Math.max(90, Math.round(s.fans * 0.03))
+      s.fans = Math.max(0, s.fans - loss)
+      s.opinion = clamp(s.opinion - 3, -40, 40)
+      s.hotSearch = { text: `${s.name} 未试镜进组`, tone: 'bad', daysLeft: 4 }
+      s.news = { text: `${s.name} 未试镜进组`, tone: 'bad', kind: 'hot' }
+      return '你没有解释。「没试镜」三个字越传越像默认。'
+    },
+  },
+  {
+    id: 'gossip-edit',
+    when: (s) => s.fans >= 2000,
+    event: () => ({
+      id: 'gossip-edit',
+      title: '丑剪',
+      body: `一档综艺把你剪成爱插话、爱哭。正片评论比你本人还像人设。
+
+节目组来问：要不要把未剪的那段也挂上去。发了像撕，不发就像认了。`,
+      options: [
+        { id: 'raw', label: '自己发未剪的那段' },
+        { id: 'quiet', label: '不撕节目组' },
+      ],
+    }),
+    apply: (s, optionId) => {
+      if (optionId === 'raw') {
+        s.fans += 280
+        s.opinion = clamp(s.opinion - 2, -40, 40)
+        s.flags.uglyCutFight = true
+        s.news = { text: `${s.name} 发综艺未剪版`, tone: 'mixed', kind: 'hot' }
+        return '你把未剪的那段挂了出去。路人说终于看清了，节目组这周没再约你。'
+      }
+      s.mood = clamp(s.mood - 6, 0, 108)
+      s.opinion = clamp(s.opinion - 1, -40, 40)
+      s.news = { text: `${s.name} 综艺人设`, tone: 'mixed', kind: 'gossip' }
+      return '你没有发。那版剪辑还在播，人设被钉了一阵。节目组过了两周又来问档期。'
+    },
+  },
+  {
+    id: 'gossip-cutcp',
+    when: (s) => (s.bookings?.length ?? 0) > 0 && s.fans >= 1800,
+    event: (s) => {
+      const b = (s.bookings ?? []).find((x) => x.phase === 'shoot') ?? s.bookings?.[0]
+      const script = b ? scriptById(b.scriptId) : null
+      const lead = script?.leads[0] || '男主'
+      const title = script?.title ?? '这部戏'
+      return {
+        id: 'gossip-cutcp',
+        title: '切片',
+        body: `有人把你和${lead}在《${title}》里的对手戏剪成十六秒。弹幕写眼神，官配粉骂你消费，路人当官宣。
+
+他那边让助理问你：切割，还是当没看见。`,
+        options: [
+          { id: 'kill', label: '切割，说只是角色' },
+          { id: 'leave', label: '不回，当营业' },
+        ],
+      }
+    },
+    apply: (s, optionId) => {
+      const b = (s.bookings ?? []).find((x) => x.phase === 'shoot') ?? s.bookings?.[0]
+      const lead = b ? scriptById(b.scriptId)?.leads[0] : '男主'
+      if (optionId === 'kill') {
+        s.fans = Math.max(0, s.fans - Math.max(120, Math.round(s.fans * 0.04)))
+        s.opinion = clamp(s.opinion + 1, -40, 40)
+        if (s.met.liangshi) bumpFavor(s, 'liangshi', -3)
+        s.news = { text: `${s.name} 回应只是角色`, tone: 'mixed', kind: 'hot' }
+        return `工作室发了「戏里的事」。官配粉消停了，切片粉走了一批。${lead}那边没再问。`
+      }
+      s.fans += 520
+      s.opinion = clamp(s.opinion - 3, -40, 40)
+      s.hotSearch = { text: `${s.name} ${lead} 十六秒`, tone: 'mixed', daysLeft: 5 }
+      s.news = { text: `${s.name} ${lead} 十六秒`, tone: 'mixed', kind: 'hot' }
+      return '你们都没有回。那十六秒挂了几天，后来有人开始写你蹭。'
+    },
+  },
+  {
+    id: 'gossip-face',
+    when: (s) => s.fans >= 1600,
+    event: (s) => ({
+      id: 'gossip-face',
+      title: '换脸',
+      body: `有人用${s.name}的脸生成了不合适的视频。平台先限流，评论已经在转。截图比原片跑得快。
+
+助理问你：走投诉，还是当没看见。`,
+      options: [
+        { id: 'cut', label: '投诉下架' },
+        { id: 'quiet', label: '当看不见' },
+      ],
+    }),
+    apply: (s, optionId) => {
+      if (optionId === 'cut') {
+        s.money = Math.max(0, s.money - 4000)
+        s.mood = clamp(s.mood - 3, 0, 108)
+        s.news = { text: `${s.name} 投诉换脸视频`, tone: 'mixed', kind: 'hot' }
+        return '投诉走完，链接少了。截图还在。有人说你在管，也有人说你心虚。'
+      }
+      s.mood = clamp(s.mood - 8, 0, 108)
+      s.opinion = clamp(s.opinion - 3, -40, 40)
+      s.hotSearch = { text: `${s.name} 换脸视频`, tone: 'bad', daysLeft: 4 }
+      s.news = { text: `${s.name} 换脸视频`, tone: 'bad', kind: 'hot' }
+      return '你没有回。视频还在转，有人当成你默许。'
+    },
+  },
+  {
+    id: 'gossip-credit',
+    when: (s) => (s.bookings?.length ?? 0) > 0 && s.fans >= 2200,
+    event: (s) => {
+      const title = filmingTitle(s) ?? '新剧'
+      return {
+        id: 'gossip-credit',
+        title: '番位',
+        body: `《${title}》新海报出来，你的名字缩到几乎看不见。跟拍的人先吵谁该排前面，片方说按合同。
+
+周衡把海报转给你：「谈不谈。谈了像争，不谈这一版就定了。」`,
+        options: [
+          { id: 'fight', label: '让公司去谈' },
+          { id: 'smile', label: '发祝贺，当没看见' },
+        ],
+      }
+    },
+    apply: (s, optionId) => {
+      const title = filmingTitle(s) ?? '新剧'
+      if (optionId === 'fight') {
+        s.money = Math.max(0, s.money - 9000)
+        s.opinion = clamp(s.opinion + 2, -40, 40)
+        s.fans = Math.max(0, s.fans - Math.max(40, Math.round(s.fans * 0.01)))
+        if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 4)
+        s.news = { text: `《${title}》海报名字顺序`, tone: 'mixed', kind: 'hot' }
+        return '公司去谈了。后来补了一版，你的名字大了一号。粉说你争，片方这周没再拖通告。'
+      }
+      s.fans += 160
+      s.opinion = clamp(s.opinion - 2, -40, 40)
+      s.news = { text: `${s.name} 祝贺新海报`, tone: 'good', kind: 'gossip' }
+      return '你发了祝贺，没提名字。这一版就定了。后来的通告里，你的名字仍靠后。'
+    },
+  },
+  {
+    id: 'gossip-vote',
+    when: (s) => s.fans >= 5000,
+    event: (s) => ({
+      id: 'gossip-vote',
+      title: '控评',
+      body: `夸${s.name}的热搜被扒出是买的。倒计时还没走完，票数一下跳了几十万，不像真人点的。
+
+平台把页面藏了，截图已经出去。粉丝连夜说是自发，路人说那是房间里刷的。`,
+      options: [
+        { id: 'cut', label: '工作室切割，说粉丝自愿' },
+        { id: 'quiet', label: '装不知道' },
+      ],
+    }),
+    apply: (s, optionId) => {
+      if (optionId === 'cut') {
+        const loss = Math.max(150, Math.round(s.fans * 0.05))
+        s.fans = Math.max(0, s.fans - loss)
+        s.opinion = clamp(s.opinion + 1, -40, 40)
+        if (s.met.zhouheng) bumpFavor(s, 'zhouheng', 2)
+        s.news = { text: `${s.name} 回应热搜数据`, tone: 'mixed', kind: 'hot' }
+        return '工作室发了声明，说投票是粉丝自愿。路人觉得你至少回了。粉走了一截。'
+      }
+      const loss = Math.max(80, Math.round(s.fans * 0.02))
+      s.fans = Math.max(0, s.fans - loss)
+      s.opinion = clamp(s.opinion - 4, -40, 40)
+      s.hotSearch = { text: `${s.name} 热搜数据异常`, tone: 'bad', daysLeft: 5 }
+      s.news = { text: `${s.name} 热搜数据异常`, tone: 'bad', kind: 'hot' }
+      return '你没有回。截图挂了更久，观感比掉粉难看。'
+    },
+  },
+  {
+    id: 'gossip-senior',
+    when: (s) => s.fans >= 2500,
+    event: () => ({
+      id: 'gossip-senior',
+      title: '前辈',
+      body: `活动后台，你和影后陈晚秋前后脚。跟拍只留你低头看手机那三秒，写成没打招呼、耍大牌。
+
+她助理没联系你。你这边助理问：发合照，还是让他们解释流程。`,
+      options: [
+        { id: 'photo', label: '发合照，说没看见' },
+        { id: 'flow', label: '让助理解释流程' },
+      ],
+    }),
+    apply: (s, optionId) => {
+      if (optionId === 'photo') {
+        s.fans += 110
+        s.mood = clamp(s.mood - 2, 0, 108)
+        s.news = { text: `${s.name} 陈晚秋 后台合照`, tone: 'mixed', kind: 'hot' }
+        return '你发了合照，说当时在看提词。大部分人收场，仍有人说补拍。她本人没转发，也没再被写成不愉快。'
+      }
+      s.fans = Math.max(0, s.fans - Math.max(70, Math.round(s.fans * 0.02)))
+      s.opinion = clamp(s.opinion - 3, -40, 40)
+      s.hotSearch = { text: `${s.name} 后台耍大牌`, tone: 'bad', daysLeft: 4 }
+      s.news = { text: `${s.name} 后台耍大牌`, tone: 'bad', kind: 'hot' }
+      return '助理解释了动线。越描越细。热搜还是「耍大牌」，她那边这周没有同框。'
+    },
+  },
 ]
 
 export function gossipPlaza(state: GameState): { user: string; text: string }[] {
