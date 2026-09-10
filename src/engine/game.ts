@@ -28,7 +28,7 @@ import { buildPromoTasks, promoLine, PROMO_LABEL } from './promo'
 import { careerFameMult, careerPayMult, careerRung, rankUpLine, ROLE_FAME } from './rank'
 import { announceFor, pickBuzzScript, rumorFor, shouldAnnounce, wrapNewsFor } from './buzz'
 import { applyGossipChoice, maybeGossip } from './gossip'
-import { applyCalendarChoice, applyCeremonyChoice, ceremonyPlayEvent, ceremonySlotName, ensureCeremonyPlan, maybeCalendar, missCeremonyIfNeeded, parseCeremonyPlan } from './calendar'
+import { applyCalendarChoice, applyCeremonyChoice, ceremonyPlayEvent, ensureCeremonyPlan, maybeCalendar, missCeremonyIfNeeded, parseCeremonyPlan } from './calendar'
 import { storyEvent } from './story'
 import {
   ATTR_KEYS,

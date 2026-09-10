@@ -247,7 +247,7 @@ const DONE_TALK: Record<string, (name: string) => { user: string; text: string }
     { user: '影评号', text: `颁奖季会不会提${n}，现在说还早。书店那场有人反复看。` },
   ],
   sweet: (n) => [
-    { user: '切片账号', text: '摘戒指那一下。有人问名字。' },
+    { user: '切片账号', text: `摘戒指那一下。有人问是不是${n}。` },
   ],
   summer: (n) => [
     { user: '粉', text: `林夏加练那段我反复看。是${n}。` },
