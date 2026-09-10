@@ -156,6 +156,7 @@ export const ACTIONS: ActionDef[] = [
   { id: 'train-acting', name: '表演课', slot: 'day', kind: 'train', desc: '排一下午对手戏。', money: -3200, stamina: -22, mood: -4, attr: { acting: 3 } },
   { id: 'train-talent', name: '声乐 / 编舞', slot: 'day', kind: 'train', desc: '练声，再把舞顺一遍。', money: -3000, stamina: -24, mood: -3, attr: { talent: 3, fitness: 1 } },
   { id: 'train-speech', name: '口才课', slot: 'day', kind: 'train', desc: '练采访和临场回答。', money: -2400, stamina: -16, mood: -2, attr: { speech: 3 } },
+  { id: 'train-confidence', name: '镜头课', slot: 'day', kind: 'train', desc: '对着机器练站、练看镜头。', money: -2400, stamina: -16, mood: -2, attr: { confidence: 3 } },
   { id: 'train-poise', name: '礼仪课', slot: 'day', kind: 'train', desc: '从走路坐姿重新练起。', money: -2800, stamina: -14, mood: 2, attr: { poise: 3 } },
   { id: 'train-fashion', name: '造型课', slot: 'day', kind: 'train', desc: '学着自己挑衣服和妆面。', money: -2600, stamina: -14, attr: { fashion: 3 } },
   { id: 'train-wit', name: '商业课', slot: 'day', kind: 'train', desc: '学合同、报价和行业规矩。', money: -2200, stamina: -12, attr: { wit: 3 } },

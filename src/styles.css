@@ -447,10 +447,28 @@ button.tiny.on {
   font-size: 15px;
 }
 
-.career-card p {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.45;
+.career-card.is-locked h3,
+.career-card.is-locked p {
+  color: var(--muted);
+}
+
+.codex-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(var(--phone), calc(100% - 24px));
+  background: var(--ink);
+  color: var(--paper);
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.restart-ask {
+  z-index: 30;
 }
 
 .rank-box {

@@ -2922,6 +2922,37 @@ function scriptUnlocked(script: ScriptDef, access?: OfferAccess): boolean {
   return false
 }
 
+const GRADE_RANK: Record<ScriptGrade, number> = { C: 0, B: 1, A: 2, S: 3 }
+
+function nextGrade(grade: ScriptGrade): ScriptGrade | null {
+  if (grade === 'C') return 'B'
+  if (grade === 'B') return 'A'
+  if (grade === 'A') return 'S'
+  return null
+}
+
+function highestTakeable(
+  scripts: ScriptDef[],
+  attrs: Attrs | undefined,
+  career: { recognition: number; fans: number },
+): ScriptGrade {
+  if (!attrs) return 'S'
+  const can = (grade: ScriptGrade) =>
+    scripts.some((script) => script.grade === grade && canTakeScript(attrs, script, career))
+  if (can('A')) return can('S') ? 'S' : 'A'
+  if (can('B')) return 'B'
+  return 'C'
+}
+
+function shuffleScripts(list: ScriptDef[], rng: () => number): ScriptDef[] {
+  const shuffled = [...list]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
 export function monthOfferIds(
   seed: number,
   week: number,
@@ -2932,11 +2963,13 @@ export function monthOfferIds(
   track: Track = 'film',
   fans = 0,
   access?: OfferAccess,
+  attrs?: Attrs,
 ): string[] {
   const m = monthIndex(week)
   const year = playYear(week)
   const rng = mulberry32((seed + (m + 1) * 1315423911 + (track === 'music' ? 17 : track === 'variety' ? 31 : 0)) >>> 0)
   const blocked = new Set([...finished, ...filmingIds])
+  const career = { recognition, fans }
   const pool = SCRIPTS.filter((s) => {
     if (s.track !== track || blocked.has(s.id) || !scriptUnlocked(s, access)) return false
     if ((s.fromYear ?? 1) > year) return false
@@ -2949,8 +2982,11 @@ export function monthOfferIds(
     if (s.unlock) return true
     return roleOffered(s.roleTier, recognition, fans, year)
   })
-  const specials = pool.filter((s) => s.unlock)
-  const regular = pool.filter((s) => !s.unlock)
+  const maxTake = highestTakeable(pool, attrs, career)
+  const cap = attrs ? GRADE_RANK[maxTake] + 1 : 3
+  const capped = pool.filter((s) => GRADE_RANK[s.grade] <= cap)
+  const specials = capped.filter((s) => s.unlock)
+  const regular = capped.filter((s) => !s.unlock)
   const staples = regular.filter((s) => !s.random)
   const extras = regular.filter((s) => s.random && rng() > 0.42)
   let cand = [...staples, ...extras]
@@ -2960,20 +2996,40 @@ export function monthOfferIds(
     const older = cand.filter((s) => (s.fromYear ?? 1) < year)
     cand = now.length >= 3 ? now : [...now, ...older]
   }
-  const shuffled = [...cand]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  const takeable = cand.filter((s) => !attrs || canTakeScript(attrs, s, career))
+  const stretchGrade = nextGrade(maxTake)
+  const stretch = stretchGrade ? cand.filter((s) => s.grade === stretchGrade) : []
+  const specialPick = shuffleScripts(specials, rng).slice(0, 2)
+  const picked: ScriptDef[] = [...specialPick]
+  const used = new Set(specialPick.map((s) => s.id))
+  const core = shuffleScripts(
+    takeable.filter((s) => s.grade === maxTake && !used.has(s.id)),
+    rng,
+  )
+  const lower = shuffleScripts(
+    takeable.filter((s) => GRADE_RANK[s.grade] < GRADE_RANK[maxTake] && !used.has(s.id)),
+    rng,
+  )
+  const takeableQueue = [...core, ...lower]
+  const stretchPool = shuffleScripts(
+    stretch.filter((s) => !used.has(s.id)),
+    rng,
+  )
+  const keepStretch = stretchPool.length > 0 && picked.length < 3
+  const takeableNeed = Math.min(takeableQueue.length, Math.max(0, 3 - picked.length - (keepStretch ? 1 : 0)))
+  picked.push(...takeableQueue.slice(0, takeableNeed))
+  for (const s of picked) used.add(s.id)
+  if (picked.length < 3 && keepStretch) {
+    const extra = stretchPool.find((s) => !used.has(s.id))
+    if (extra) {
+      picked.push(extra)
+      used.add(extra.id)
+    }
   }
-  const forced = [...specials]
-  for (let i = forced.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[forced[i], forced[j]] = [forced[j], forced[i]]
+  if (picked.length < 3) {
+    picked.push(...takeableQueue.filter((s) => !used.has(s.id)).slice(0, 3 - picked.length))
   }
-  const pickSpecial = forced.slice(0, 2)
-  const need = Math.max(0, 3 - pickSpecial.length)
-  const ids = [...pickSpecial, ...shuffled.filter((s) => !pickSpecial.includes(s)).slice(0, need)].map((s) => s.id)
-  return ids.slice(0, 3)
+  return picked.slice(0, 3).map((s) => s.id)
 }
 
 export function monthOffers(week: number, finished: string[], filmingId: string | null): ScriptDef[] {

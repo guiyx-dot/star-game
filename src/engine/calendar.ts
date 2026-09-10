@@ -182,18 +182,18 @@ function evaluateNomination(state: GameState, ev: SeasonEvent): CeremonyDue {
     acting >= actingBar &&
     state.recognition >= recBar &&
     state.fans >= fansBar
-  if (!eligible) return named
+  if (!eligible) return { ...named, eligible: false }
   const seed = ((state.offerSeed + state.week * 997 + ev.id.length * 13) >>> 0) % 100
   const nomActing = year >= 3 && leadWork ? 155 : year >= 2 ? 132 : 122
   const nomChance = work.quality >= 90 && acting >= nomActing && state.recognition >= (year >= 3 ? 48 : 32) ? 72 : 48
   const nominated = seed < nomChance
-  if (!nominated) return named
+  if (!nominated) return { ...named, eligible: true }
   const winActing = year >= 3 && leadWork ? 152 : year >= 2 ? 128 : 118
   const winBar = work.quality >= 88 && acting >= winActing && state.recognition >= (year >= 3 ? 48 : 28)
   const winSeed = ((state.offerSeed + state.week * 131 + 7) >>> 0) % 100
   const winChance = (year >= 3 && leadWork ? 4 : 6) + Math.min(10, Math.floor((work.quality - 88) / 2))
   const win = winBar && winSeed < winChance
-  return { ...named, nominated: true, win }
+  return { ...named, nominated: true, win, eligible: true }
 }
 
 function nomLines(state: GameState, ev: SeasonEvent, due: CeremonyDue): string[] {
@@ -244,12 +244,15 @@ function fashionWatch(ev: SeasonEvent, state: GameState): GameEvent {
 }
 
 function nominationEvent(state: GameState, ev: SeasonEvent, due: CeremonyDue): GameEvent {
-  return storyEvent(
-    `cal-nom-${ev.id}`,
-    ev.name,
-    nomLines(state, ev, due),
-    [{ id: 'ok', label: due.nominated ? '回去排行程' : '知道了' }],
-  )
+  const options = due.nominated
+    ? [{ id: 'ok', label: '回去排行程' }]
+    : due.eligible
+      ? [
+          { id: 'ok', label: '回去看自己的本' },
+          { id: 'sit', label: '去坐后排' },
+        ]
+      : [{ id: 'ok', label: '知道了' }]
+  return storyEvent(`cal-nom-${ev.id}`, ev.name, nomLines(state, ev, due), options)
 }
 
 export function ceremonyPlayEvent(state: GameState, due: CeremonyDue): GameEvent {
@@ -298,7 +301,7 @@ function watchNews(ev: SeasonEvent, due: CeremonyDue, name: string): NewsFlash {
   return { text: `${ev.name}入围 ${ev.rival} ${STAR.jiangwanning} ${STAR.baishuying}`, tone: 'mixed', kind: 'award' }
 }
 
-export function applyCalendarChoice(state: GameState, eventId: string): string {
+export function applyCalendarChoice(state: GameState, eventId: string, optionId = 'ok'): string {
   if (eventId.startsWith('cal-nom-')) {
     const ev = seasonById(eventId.slice(8))
     if (!ev) return ''
@@ -306,6 +309,13 @@ export function applyCalendarChoice(state: GameState, eventId: string): string {
     if (due?.nominated) {
       state.news = watchNews(ev, due, state.name)
       return '周衡把典礼那天标红了。这周要空出一天。'
+    }
+    if (optionId === 'sit' && due?.eligible) {
+      state.flags[`cerDone:${ev.id}:${seasonYear(state.week)}`] = true
+      state.flags[`cerSit:${ev.id}:${seasonYear(state.week)}`] = true
+      state.ceremonyDue = null
+      state.news = watchNews(ev, due, state.name)
+      return '你去了后排。灯很亮，镜头没有找你。散场比想象中早。'
     }
     state.ceremonyDue = null
     state.news = watchNews(ev, due ?? evaluateNomination(state, ev), state.name)
@@ -371,6 +381,7 @@ export function maybeCalendar(state: GameState) {
     return
   }
   const due = evaluateNomination(state, ev)
+  if (due.eligible) state.flags[`cerEligible:${ev.id}:${seasonYear(state.week)}`] = true
   state.ceremonyDue = due.nominated ? due : { ...due, week: state.week }
   if (state.event) {
     if (!state.news) state.news = watchNews(ev, due, state.name)

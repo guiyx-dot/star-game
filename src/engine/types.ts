@@ -76,6 +76,7 @@ export type CeremonyDue = {
   week: number
   nominated: boolean
   win: boolean
+  eligible?: boolean
   scriptId?: string
   rival: string
   awardName: string

@@ -29,6 +29,7 @@ import { careerFameMult, careerPayMult, careerRung, rankUpLine, ROLE_FAME } from
 import { announceFor, pickBuzzScript, rumorFor, shouldAnnounce, wrapNewsFor } from './buzz'
 import { applyGossipChoice, maybeGossip } from './gossip'
 import { applyCalendarChoice, applyCeremonyChoice, ceremonyPlayEvent, ensureCeremonyPlan, maybeCalendar, missCeremonyIfNeeded, parseCeremonyPlan } from './calendar'
+import { clearCodex, syncCodex } from './codex'
 import { storyEvent } from './story'
 import {
   ATTR_KEYS,
@@ -286,6 +287,7 @@ export function currentOffers(state: GameState, track: Track = 'film'): ScriptDe
     track,
     state.fans,
     { flags: state.flags, favor: state.favor, met: state.met },
+    effectiveAttrs(state),
   )
     .filter((id) => !declined.has(id))
     .map((id) => scriptById(id))
@@ -397,8 +399,18 @@ export function plannerActions(state: GameState, slot: Slot): ActionDef[] {
   return ACTIONS.filter((a) => actionAvailable(state, a, slot))
 }
 
+export function planFillFrom(state: GameState, slot: Slot): number {
+  if (state.phase !== 'play') return 0
+  if (slot === 'day' && state.slot === 'eve') return state.weekday + 1
+  return state.weekday
+}
+
 export function setPlan(state: GameState, weekday: number, slot: Slot, actionId: ActionId | null): GameState {
   const next = clone(state)
+  if (weekday < planFillFrom(next, slot)) {
+    next.lastNote = '过完的改不了。'
+    return next
+  }
   next.plan[weekday][slot] = actionId
   return next
 }
@@ -407,8 +419,8 @@ export function fillEmpty(state: GameState, actionId: ActionId): GameState {
   const next = clone(state)
   const action = actionById(actionId)
   if (!action) return next
-  for (let i = 0; i < 7; i++) {
-    for (const slot of ['day', 'eve'] as Slot[]) {
+  for (const slot of ['day', 'eve'] as Slot[]) {
+    for (let i = planFillFrom(next, slot); i < 7; i++) {
       if (next.plan[i][slot]) continue
       if (!actionAvailable(next, action, slot)) continue
       next.plan[i][slot] = actionId
@@ -422,7 +434,7 @@ export function fillEmptyInSlot(state: GameState, actionId: ActionId, slot: Slot
   const work = parseWorkPlan(actionId)
   if (work) {
     if (work.phase === 'promo') return fillRemainingPromo(state, work.scriptId, slot)
-    for (let i = 0; i < 7; i++) {
+    for (let i = planFillFrom(next, slot); i < 7; i++) {
       if (next.plan[i][slot]) continue
       if (!workAvailable(next, work.phase, work.scriptId, slot, work.promoIndex)) continue
       next.plan[i][slot] = actionId
@@ -431,7 +443,7 @@ export function fillEmptyInSlot(state: GameState, actionId: ActionId, slot: Slot
   }
   const action = actionById(actionId)
   if (!action) return next
-  for (let i = 0; i < 7; i++) {
+  for (let i = planFillFrom(next, slot); i < 7; i++) {
     if (next.plan[i][slot]) continue
     if (!actionAvailable(next, action, slot)) continue
     next.plan[i][slot] = actionId
@@ -461,7 +473,7 @@ export function assignNext(state: GameState, actionId: ActionId, slot: Slot): Ga
       next.lastNote = '这周只要去一天。'
       return next
     }
-    for (let i = 0; i < 7; i++) {
+    for (let i = planFillFrom(next, slot); i < 7; i++) {
       if (next.plan[i][slot]) continue
       next.plan[i][slot] = actionId
       return next
@@ -475,7 +487,7 @@ export function assignNext(state: GameState, actionId: ActionId, slot: Slot): Ga
       next.lastNote = slot === 'eve' ? '晚上排不了这个。' : '这部现在排不了。'
       return next
     }
-    for (let i = 0; i < 7; i++) {
+    for (let i = planFillFrom(next, slot); i < 7; i++) {
       if (next.plan[i][slot]) continue
       next.plan[i][slot] = actionId
       return next
@@ -489,7 +501,7 @@ export function assignNext(state: GameState, actionId: ActionId, slot: Slot): Ga
     next.lastNote = slot === 'eve' ? '晚上排不了这个。' : '白天排不了这个。'
     return next
   }
-  for (let i = 0; i < 7; i++) {
+  for (let i = planFillFrom(next, slot); i < 7; i++) {
     if (next.plan[i][slot]) continue
     next.plan[i][slot] = actionId
     return next
@@ -1027,6 +1039,7 @@ function everydayResult(action: ActionDef): string {
     'train-acting': '表演课上排了三轮对手戏。老师把你最习惯的小动作挑了个遍。',
     'train-talent': '练声和编舞连着上了一下午。最后一遍结束时，衣服已经被汗浸透。',
     'train-speech': '老师拿临时问题追问了一个下午。到下课时，你总算不再每句话都想半天。',
+    'train-confidence': '机器一直开着。你看镜头的时候总想先躲开，下课前那一遍终于没有低头。',
     'train-poise': '你顶着书走了很多遍，又重新练了落座和起身。看着简单，做完腰背都酸。',
     'train-fashion': '造型老师让你自己搭了三套衣服，再把最用力的那套全部换掉。',
     'train-wit': '你看了几份真实合同，终于分清报价、分成和违约条款不是一回事。',
@@ -1148,6 +1161,7 @@ function applyAction(state: GameState, action: ActionDef): string {
     )
     state.fans += fanGain
     addAttr(state, { confidence: quality > 60 ? 2 : 1 })
+    state.flags.didLive = true
     return done(everydayResult(action))
   }
   if (action.kind === 'social' && action.npcId) {
@@ -1176,7 +1190,10 @@ function yearTurnEvent(week: number): GameEvent | null {
 有的人已经不联系。
 
 影后不是年终礼物。你把抽屉关上。`,
-      options: [{ id: 'ok', label: '合上' }],
+      options: [
+        { id: 'ok', label: '合上' },
+        { id: 'again', label: '再来三年' },
+      ],
     }
   }
   if (week === YEAR_WEEKS + 1) {
@@ -1289,7 +1306,7 @@ function maybeStoryEvent(state: GameState): GameEvent | null {
 
 function applyStoryChoice(state: GameState, eventId: string, optionId: string): string {
   if (eventId.startsWith('cal-')) {
-    return applyCalendarChoice(state, eventId)
+    return applyCalendarChoice(state, eventId, optionId)
   }
   if (eventId.startsWith('ceremony-')) {
     return applyCeremonyChoice(state)
@@ -1568,6 +1585,26 @@ export function choose(state: GameState, optionId: string): GameState {
   return continueAfter(next)
 }
 
+export function skipEmpty(state: GameState): GameState {
+  const next = clone(state)
+  if (next.event || next.phase !== 'play') return next
+  if (next.plan[next.weekday][next.slot]) return next
+  violateIfNeeded(next)
+  if (next.event) return next
+  if (next.slot === 'eve') {
+    const story = maybeStoryEvent(next)
+    if (story) {
+      next.event = story
+      return next
+    }
+    return advance(next)
+  }
+  const before = snapStats(next)
+  next.stamina = clamp(next.stamina + 8, 0, STA_MAX)
+  log(next, withDelta(before, next, '没安排。在家耗着。'))
+  return advance(next)
+}
+
 export function resolveCurrent(state: GameState): GameState {
   const next = clone(state)
   if (next.event || next.phase !== 'play') return next
@@ -1584,10 +1621,7 @@ export function resolveCurrent(state: GameState): GameState {
       }
       return advance(next)
     }
-    const before = snapStats(next)
-    next.stamina = clamp(next.stamina + 8, 0, STA_MAX)
-    log(next, withDelta(before, next, '没安排。在家耗着。'))
-    return advance(next)
+    return next
   }
   const ceremony = parseCeremonyPlan(actionId)
   if (ceremony) {
@@ -1725,9 +1759,8 @@ export function inviteBlocked(state: GameState, npc: NpcId): string | null {
   if (!state.met[npc]) return '通讯录里还没有这个人。'
   if (state.phase !== 'plan' && state.phase !== 'play') return '现在约不了。'
   if (state.plan.some((d) => d.eve === action.id)) return '这周已经约过。'
-  const start = state.phase === 'play' ? state.weekday : 0
+  const start = planFillFrom(state, 'eve')
   for (let i = start; i < 7; i++) {
-    if (state.phase === 'play' && i === state.weekday && state.slot === 'eve') continue
     if (state.plan[i].eve) continue
     if (!actionAvailable(state, action, 'eve')) continue
     return null
@@ -1744,9 +1777,8 @@ export function inviteNpc(state: GameState, npc: NpcId): GameState {
   }
   const action = actionById(`date-${npc}`)
   if (!action) return next
-  const start = next.phase === 'play' ? next.weekday : 0
+  const start = planFillFrom(next, 'eve')
   for (let i = start; i < 7; i++) {
-    if (next.phase === 'play' && i === next.weekday && next.slot === 'eve') continue
     if (next.plan[i].eve) continue
     if (!actionAvailable(next, action, 'eve')) continue
     next.plan[i].eve = action.id
@@ -1935,8 +1967,9 @@ export function buyHouse(state: GameState, houseId: string): GameState {
   return next
 }
 
-export function saveState(state: GameState) {
+export function saveState(state: GameState): string[] {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state))
+  return syncCodex(state)
 }
 
 function refreshSavedStory(state: GameState) {
@@ -2037,6 +2070,7 @@ export function loadState(): GameState | null {
       const turn = yearTurnEvent(loaded.week)
       if (turn) loaded.event = turn
     }
+    syncCodex(loaded)
     return loaded
   } catch {
     return null
@@ -2045,6 +2079,11 @@ export function loadState(): GameState | null {
 
 export function clearSave() {
   localStorage.removeItem(SAVE_KEY)
+}
+
+export function clearAllProgress() {
+  clearSave()
+  clearCodex()
 }
 
 export function titleState(): GameState {

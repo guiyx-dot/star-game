@@ -448,6 +448,8 @@ const TIP_TAPES: TipTape[] = [
   },
 ]
 
+export const CODEX_TAPES = TIP_TAPES.map((t) => t.id)
+
 function pickTipTape(s: GameState): TipTape {
   const fresh = TIP_TAPES.filter((t) => !s.flags[`tip:${t.id}`])
   const pool = fresh.length ? fresh : TIP_TAPES

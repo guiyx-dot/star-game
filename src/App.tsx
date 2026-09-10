@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { IDENTITIES, ITEMS, NPC_BIO, NPC_ORDER, inviteVerb, HOUSES, houseById, identityById, TRIPS } from './engine/catalog'
 import { Planner } from './Planner'
 import { ScriptNeed, ScriptSheet } from './ScriptSheet'
@@ -27,6 +27,7 @@ import {
   buyHouse,
   buyItem,
   choose,
+  clearAllProgress,
   clearSave,
   createState,
   currentOffers,
@@ -50,7 +51,17 @@ import {
   hypeLine,
   roleLine,
   scriptById,
+  SCRIPTS,
 } from './engine/scripts'
+import {
+  ACHIEVEMENTS,
+  achievementStats,
+  bumpNgPlus,
+  CODEX_PEOPLE,
+  CODEX_TAPES,
+  loadCodex,
+  TAPE_LABEL,
+} from './engine/codex'
 
 function yuan(n: number): string {
   if (Math.abs(n) >= 10000) return `${(n / 10000).toFixed(1)}万`
@@ -228,11 +239,14 @@ function RankGlance({ state }: { state: GameState }) {
 }
 
 function Career({ state, onClose }: { state: GameState; onClose: () => void }) {
-  const [tab, setTab] = useState<'works' | 'awards'>('works')
+  const [tab, setTab] = useState<'works' | 'awards' | 'achievements' | 'codex'>('works')
+  const [codexTab, setCodexTab] = useState<'plays' | 'people' | 'tapes' | 'cups'>('plays')
   const filming = state.bookings ?? []
   const filmingIds = new Set(filming.map((b) => b.scriptId))
   const done = [...state.finishedScripts].reverse().filter((id) => !filmingIds.has(id))
   const awards = state.awards ?? []
+  const codex = loadCodex()
+  const stats = achievementStats(codex)
 
   return (
     <div className="modal-back" onClick={onClose}>
@@ -244,6 +258,12 @@ function Career({ state, onClose }: { state: GameState; onClose: () => void }) {
           </button>
           <button className={tab === 'awards' ? 'is-on' : ''} onClick={() => setTab('awards')}>
             奖项
+          </button>
+          <button className={tab === 'achievements' ? 'is-on' : ''} onClick={() => setTab('achievements')}>
+            成就
+          </button>
+          <button className={tab === 'codex' ? 'is-on' : ''} onClick={() => setTab('codex')}>
+            图鉴
           </button>
         </div>
         {tab === 'works' ? (
@@ -278,7 +298,7 @@ function Career({ state, onClose }: { state: GameState; onClose: () => void }) {
               )
             })}
           </div>
-        ) : (
+        ) : tab === 'awards' ? (
           <div className="career-list">
             {awards.length === 0 ? (
               <p className="muted">还没有你的奖。</p>
@@ -296,6 +316,108 @@ function Career({ state, onClose }: { state: GameState; onClose: () => void }) {
                 )
               })
             )}
+          </div>
+        ) : tab === 'achievements' ? (
+          <div className="career-list">
+            <p className="muted">
+              {stats.got} / {stats.total}
+              {codex.ngPlusCount ? ` · 已再来 ${codex.ngPlusCount} 次` : ''}
+            </p>
+            <p className="phone-sec">这一局主线</p>
+            {ACHIEVEMENTS.filter((a) => a.group === 'main').map((a) => {
+              const on = Boolean(codex.achievements[a.id])
+              return (
+                <div key={a.id} className={`career-card${on ? '' : ' is-locked'}`}>
+                  <h3 className="serif">{on ? a.name : '未点亮'}</h3>
+                  <p className="muted">{on ? a.hint : a.hint}</p>
+                </div>
+              )
+            })}
+            <p className="phone-sec">另一条路</p>
+            {ACHIEVEMENTS.filter((a) => a.group === 'other').map((a) => {
+              const on = Boolean(codex.achievements[a.id])
+              return (
+                <div key={a.id} className={`career-card${on ? '' : ' is-locked'}`}>
+                  <h3 className="serif">{on ? a.name : '未点亮'}</h3>
+                  <p className="muted">{a.hint}</p>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="career-list">
+            <div className="tabs">
+              <button className={codexTab === 'plays' ? 'is-on' : ''} onClick={() => setCodexTab('plays')}>
+                戏
+              </button>
+              <button className={codexTab === 'people' ? 'is-on' : ''} onClick={() => setCodexTab('people')}>
+                人
+              </button>
+              <button className={codexTab === 'tapes' ? 'is-on' : ''} onClick={() => setCodexTab('tapes')}>
+                录音
+              </button>
+              <button className={codexTab === 'cups' ? 'is-on' : ''} onClick={() => setCodexTab('cups')}>
+                奖杯
+              </button>
+            </div>
+            {codexTab === 'plays' ? (
+              <>
+                <p className="muted">
+                  {stats.scriptsGot} / {stats.scriptsTotal} · 杀青并宣完才亮
+                </p>
+                {[1, 2, 3].map((year) => (
+                  <div key={year}>
+                    <p className="phone-sec">第 {year} 年</p>
+                    {SCRIPTS.filter((s) => (s.fromYear ?? 1) === year).map((s) => {
+                      const hit = codex.scripts[s.id]
+                      return (
+                        <div key={s.id} className={`career-card${hit ? '' : ' is-locked'}`}>
+                          <h3 className="serif">{hit ? `《${hit.title}》` : '未拍'}</h3>
+                          <p className="muted">{hit ? `${hit.director} · ${hit.role}` : s.type}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ))}
+              </>
+            ) : null}
+            {codexTab === 'people'
+              ? CODEX_PEOPLE.map((id) => {
+                  const hit = Boolean(codex.people[id])
+                  return (
+                    <div key={id} className={`career-card${hit ? '' : ' is-locked'}`}>
+                      <h3 className="serif">{hit ? NPC_NAME[id] : '未遇见'}</h3>
+                      <p className="muted">{NPC_BIO[id].role}</p>
+                    </div>
+                  )
+                })
+              : null}
+            {codexTab === 'tapes'
+              ? CODEX_TAPES.map((id) => {
+                  const hit = Boolean(codex.tapes[id])
+                  return (
+                    <div key={id} className={`career-card${hit ? '' : ' is-locked'}`}>
+                      <h3 className="serif">{hit ? TAPE_LABEL[id] ?? id : '未听过'}</h3>
+                      <p className="muted">片场录音</p>
+                    </div>
+                  )
+                })
+              : null}
+            {codexTab === 'cups' ? (
+              codex.trophies.length === 0 ? (
+                <p className="muted">还没有赢过。入围不算奖杯。</p>
+              ) : (
+                codex.trophies.map((t) => (
+                  <div key={t.id} className="career-card">
+                    <h3 className="serif">{t.name}</h3>
+                    <p>{t.org}</p>
+                    <p className="muted">
+                      第 {t.week} 周{t.title ? ` · 《${t.title}》` : ''}
+                    </p>
+                  </div>
+                ))
+              )
+            ) : null}
           </div>
         )}
         <div className="row" style={{ marginTop: 16 }}>
@@ -392,10 +514,28 @@ export function App() {
   const [overlay, setOverlay] = useState<Overlay>('none')
   const [name, setName] = useState('林澄')
   const [identity, setIdentity] = useState<IdentityId>('college')
+  const [fromNgPlus, setFromNgPlus] = useState(false)
+  const [restartAsk, setRestartAsk] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const skipToast = useRef(true)
 
   useEffect(() => {
-    if (state.phase !== 'title') saveState(state)
+    if (state.phase === 'title') return
+    const fresh = saveState(state)
+    if (skipToast.current) {
+      skipToast.current = false
+      return
+    }
+    if (fresh.length) {
+      setToast(fresh.length === 1 ? `点亮：${fresh[0]}` : `点亮：${fresh[0]} 等 ${fresh.length} 个`)
+    }
   }, [state])
+
+  useEffect(() => {
+    if (!toast) return
+    const t = window.setTimeout(() => setToast(null), 2800)
+    return () => window.clearTimeout(t)
+  }, [toast])
 
   const eff = useMemo(() => effectiveAttrs(state), [state])
   const house = houseById(state.houseId)
@@ -406,6 +546,7 @@ export function App() {
     return currentOffers(state, 'film')
   }, [state])
   const comments = useMemo(() => phoneComments(state), [state])
+  const seenScripts = useMemo(() => loadCodex().scripts, [state.workLog, state.finishedScripts])
 
   function patch(next: GameState) {
     setState(next)
@@ -436,8 +577,9 @@ export function App() {
     const def = identityById(identity)
     return (
       <div className="app create-screen">
-        <p className="kicker">入行之前</p>
+        <p className="kicker">{fromNgPlus ? '再来三年' : '入行之前'}</p>
         <h1>你是谁</h1>
+        {fromNgPlus ? <p className="lede">档案还在。钱、演技、粉从零开始。</p> : null}
         <label>
           名字
           <br />
@@ -462,7 +604,14 @@ export function App() {
               ? `卡里 ${yuan(def.money)}。宿舍对门还在对词。`
               : `卡里 ${yuan(def.money)}。家里能帮你进门，剩下的要靠自己。`}
         </p>
-        <button className="primary" onClick={() => patch(createState(name, identity))}>
+        <button
+          className="primary"
+          onClick={() => {
+            skipToast.current = true
+            setFromNgPlus(false)
+            patch(createState(name, identity))
+          }}
+        >
           入行
         </button>
       </div>
@@ -523,13 +672,7 @@ export function App() {
         <button className="ghost" onClick={() => setOverlay('phone')}>
           手机
         </button>
-        <button
-          className="ghost"
-          onClick={() => {
-            clearSave()
-            patch(titleState())
-          }}
-        >
+        <button className="ghost" onClick={() => setRestartAsk(true)}>
           重新开始
         </button>
       </nav>
@@ -556,6 +699,7 @@ export function App() {
                   <span>{s.director}</span>
                 </div>
                 {s.awardTrack ? <p className="award-hint">颁奖季会盯这部。</p> : null}
+                {seenScripts[s.id] ? <p className="award-hint">拍过。</p> : null}
                 {s.press[0] ? <p className="award-hint">{s.press[0]}</p> : null}
                 {s.hype === 'ip' && !s.press[0] ? <p className="award-hint">原著读者很多，选角已经传开了。</p> : null}
                 {s.unlock && highlightLine(s) ? <p className="award-hint">{highlightLine(s)}</p> : null}
@@ -756,7 +900,28 @@ export function App() {
               </p>
             ) : null}
             <h2>{state.event.title}</h2>
-            <EventStory event={state.event} onChoose={(id) => patch(choose(state, id))} />
+            <EventStory
+              event={state.event}
+              onChoose={(id) => {
+                if (state.event?.id === 'year-end' && id === 'again') {
+                  bumpNgPlus()
+                  setFromNgPlus(true)
+                  setName(state.name)
+                  clearSave()
+                  skipToast.current = true
+                  patch({ ...titleState(), phase: 'create' })
+                  return
+                }
+                patch(choose(state, id))
+              }}
+              extra={
+                state.event.id === 'year-end' && state.week > 156 ? (
+                  <p className="muted" style={{ marginTop: 8 }}>
+                    成就 {achievementStats().got} / {achievementStats().total}
+                  </p>
+                ) : null
+              }
+            />
           </div>
         </div>
       ) : null}
@@ -943,6 +1108,48 @@ export function App() {
           news={state.news}
           onClose={() => patch({ ...state, news: null })}
         />
+      ) : null}
+
+      {toast ? <div className="codex-toast">{toast}</div> : null}
+
+      {restartAsk ? (
+        <div className="modal-back restart-ask" onClick={() => setRestartAsk(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>重新开始</h2>
+            <p>这一局会清掉。档案默认留下。</p>
+            <div className="row invite-actions">
+              <button
+                className="primary"
+                onClick={() => {
+                  clearSave()
+                  skipToast.current = true
+                  setRestartAsk(false)
+                  setFromNgPlus(false)
+                  patch(titleState())
+                }}
+              >
+                只清这一局
+              </button>
+              <button
+                className="ghost"
+                onClick={() => {
+                  clearAllProgress()
+                  skipToast.current = true
+                  setRestartAsk(false)
+                  setFromNgPlus(false)
+                  patch(titleState())
+                }}
+              >
+                连档案一起清
+              </button>
+            </div>
+            <div className="row" style={{ marginTop: 8 }}>
+              <button className="ghost" onClick={() => setRestartAsk(false)}>
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </div>
   )

@@ -10,10 +10,12 @@ import {
   mdLabel,
   openTravel,
   parseWorkPlan,
+  planFillFrom,
   plannerActions,
   remainingPromoTasks,
   resolveCurrent,
   setPlan,
+  skipEmpty,
   splitLogLine,
   slotRecord,
   startWeek,
@@ -80,24 +82,43 @@ export function Planner({
 }) {
   const [view, setView] = useState<Slot>('day')
   const [tab, setTab] = useState<Tab>(() => ((state.bookings?.length ?? 0) > 0 ? 'work' : 'out'))
+  const [keepPick, setKeepPick] = useState(false)
   const playLogRef = useRef<HTMLDivElement>(null)
   const weekLog = weekLines(state, state.week)
+  const playing = state.phase === 'play'
+  const currentActionId = playing ? state.plan[state.weekday][state.slot] : null
+  const gap = playing && !state.event && !state.news && state.slot === 'day' && !state.plan[state.weekday].day
 
   useEffect(() => {
-    if (!planning) setView(state.slot)
-  }, [planning, state.slot])
+    if (planning) {
+      setKeepPick(false)
+      return
+    }
+    if (gap) setKeepPick(true)
+  }, [planning, gap])
+
+  const arranging = planning || (playing && !state.event && !state.news && state.slot === 'day' && (gap || keepPick))
 
   useEffect(() => {
-    if (planning) return
+    if (gap) setView('day')
+  }, [gap, state.weekday])
+
+  useEffect(() => {
+    if (planning || arranging) return
+    setView(state.slot)
+  }, [planning, arranging, state.slot])
+
+  useEffect(() => {
+    if (arranging) return
     const el = playLogRef.current
     if (el) el.scrollTop = el.scrollHeight
-  }, [planning, state.log, state.lastNote])
+  }, [arranging, state.log, state.lastNote])
 
   useEffect(() => {
     if (view === 'eve') setTab('leisure')
   }, [view])
 
-  const slot = planning ? view : state.slot
+  const slot = arranging ? view : state.slot
   const trainActs = plannerActions(state, slot).filter((a) => actionGroup(a) === 'train')
   const leisureActs = plannerActions(state, slot).filter((a) => actionGroup(a) === 'leisure')
   const outingActs = plannerActions(state, slot).filter(
@@ -105,12 +126,12 @@ export function Planner({
   )
   const nightActs = plannerActions(state, 'eve')
   const bookings = state.bookings ?? []
-  const currentActionId = !planning ? state.plan[state.weekday][state.slot] : null
-  const currentActionName = !planning ? slotText(state, state.weekday, state.slot) : ''
+  const currentActionName = currentActionId ? slotText(state, state.weekday, state.slot) : ''
   const currentActionGroup = groupLabel(currentActionId)
+  const fillFrom = planFillFrom(state, slot)
 
   function pick(id: string) {
-    if (!planning) return
+    if (!arranging) return
     const work = parseWorkPlan(id)
     if (work) {
       onPatch(assignNext(state, id, slot))
@@ -128,9 +149,20 @@ export function Planner({
   }
 
   function toggleDay(weekday: number) {
-    if (!planning) return
+    if (!arranging) return
+    if (weekday < fillFrom) return
     if (!state.plan[weekday][slot]) return
     onPatch(setPlan(state, weekday, slot, null))
+  }
+
+  function goNext() {
+    setKeepPick(false)
+    onPatch(resolveCurrent(state))
+  }
+
+  function passEmpty() {
+    setKeepPick(false)
+    onPatch(skipEmpty(state))
   }
 
   return (
@@ -153,7 +185,8 @@ export function Planner({
         <div className="day-list">
           {WEEKDAYS.map((_, i) => {
             const now = state.phase === 'play' && state.weekday === i && state.slot === slot
-            const filled = Boolean(state.plan[i][slot]) || (!planning && Boolean(slotRecord(state, i, slot)))
+            const passed = playing && i < fillFrom
+            const filled = Boolean(state.plan[i][slot]) || (passed && Boolean(slotRecord(state, i, slot)))
             return (
               <button
                 type="button"
@@ -169,10 +202,13 @@ export function Planner({
       </div>
 
       <div className="pick-col">
-        {planning ? (
+        {arranging ? (
           slot === 'eve' ? (
             <>
-              <p className="slots-left">夜晚</p>
+              <p className="slots-left">{planning ? '夜晚' : '空着的可以现在排。'}</p>
+              {!planning && /排满了|排不了这个|改不了|去不了|只要去一天|已经订了|出门以后/.test(state.lastNote) ? (
+                <p className="note">{state.lastNote}</p>
+              ) : null}
               <div className="train-grid">
                 {nightActs.map((a) => (
                   <button key={a.id} onClick={() => pick(a.id)}>
@@ -183,6 +219,10 @@ export function Planner({
             </>
           ) : (
             <>
+              {!planning ? <p className="slots-left">空着的可以现在排。</p> : null}
+              {!planning && /排满了|排不了这个|改不了|去不了|只要去一天|已经订了|出门以后/.test(state.lastNote) ? (
+                <p className="note">{state.lastNote}</p>
+              ) : null}
               <div className="tabs">
                 <button className={tab === 'work' ? 'is-on' : ''} onClick={() => setTab('work')}>
                   通告
@@ -346,8 +386,12 @@ export function Planner({
               出门
             </button>
           </>
+        ) : arranging && !currentActionId ? (
+          <button className="ghost ink" onClick={passEmpty}>
+            空过
+          </button>
         ) : (
-          <button className="primary" onClick={() => onPatch(resolveCurrent(state))} disabled={Boolean(state.event || state.news)}>
+          <button className="primary" onClick={goNext} disabled={Boolean(state.event || state.news)}>
             下一段
           </button>
         )}
